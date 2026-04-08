@@ -1,22 +1,22 @@
 #include "emulator.hpp"
 #include <gtest/gtest.h>
 
-class ord_test : public testing::Test {
+class general_test : public testing::Test {
 public:
     Memory mem;
     CPU cpu;
 
     //tip: do not use these in all lowercase.
-    virtual void SetUp() {
+    virtual void SetUp() override {
         cpu.reset(mem);
     }
 
-    virtual void TearDown() {
+    virtual void TearDown() override {
 
     }
 };
 
-TEST_F(ord_test, LDAICanLoadValueIntoRegister) {
+TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
     //given
     mem[0xFFFC] = CPU::INS_JSR;
     mem[0xFFFD] = 0x42;
@@ -31,4 +31,31 @@ TEST_F(ord_test, LDAICanLoadValueIntoRegister) {
 
     //then
     EXPECT_EQ(cpu.A, 0x84);
+}
+
+TEST_F(general_test, LDAZeroPageCanLoadValueIntoRegisterA) {
+    //given
+    mem[0xFFFC] = CPU::INS_LDA_ZP;
+    mem[0xFFFD] = 0x42;
+    mem[0x0042] = 0x37;
+
+    //when
+    cpu.execute(3, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+}
+
+TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterA) {
+    //given
+    cpu.X = 5;
+    mem[0xFFFC] = CPU::INS_LDA_ZPX;
+    mem[0xFFFD] = 0x42;
+    mem[0x0047] = 0x37;
+
+    //when
+    cpu.execute(4, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
 }
