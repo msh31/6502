@@ -1,0 +1,20 @@
+# Reference: https://build-cpp.github.io/cmkr/cmake-toml
+[project]
+name = "6502_emulator"
+description = "A cool 6502 emulator built in C++"
+version = "1.0.0"
+languages = ["CXX"]
+
+[fetch-content.googletest]
+git = "https://github.com/google/googletest"
+tag = "v1.17.0"
+
+[variables]
+CMAKE_EXPORT_COMPILE_COMMANDS = true
+
+# TODO: define a target for each of your executables/libraries like this:
+[target.6502_emulator]
+type = "executable" # static, shared
+sources = ["src/**.cpp", "src/**.hpp"]
+compile-features = ["cxx_std_17"]
+link-libraries = ["GTest::gtest_main"]
