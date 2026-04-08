@@ -19,6 +19,12 @@ struct Memory {
         //assert here address is < max_memory
         return data[address];
     }
+
+
+    // write 1 byte 
+    byte& operator[](u32 address) {
+        return data[address];
+    }
 };
 
 struct CPU {
@@ -35,6 +41,9 @@ struct CPU {
     byte V : 1;
     byte N : 1;
 
+    static constexpr byte
+        INS_LDA_IM = 0xA9;
+
     void reset(Memory& mem) {
         program_counter = 0xFFFC;
         stack_pointer = 0x0100;
@@ -43,7 +52,7 @@ struct CPU {
         mem.init();
     }
 
-    byte fetch_byte(u32 cycles, Memory& mem) {
+    byte fetch_byte(u32& cycles, Memory& mem) {
         byte data = mem[program_counter];
         program_counter++;
         cycles--;
@@ -55,6 +64,18 @@ struct CPU {
         while(cycles > 0) {
             byte instruction = fetch_byte(cycles, mem);
             // ()
+            switch(instruction) {
+                case INS_LDA_IM: {
+                    byte value = fetch_byte(cycles, mem);
+                    A = value;
+                    Z = (A==0);
+                    N = (A & 0b10000000) > 0;
+                    break;
+                 }
+                default:
+                    printf("Instruction not handled: %d!", instruction);
+                    break;
+            }
         }
     }
 };
@@ -63,6 +84,11 @@ int main() {
     Memory mem;
     CPU cpu;
     cpu.reset(mem);
+//prog start
+    mem[0xFFFC] = CPU::INS_LDA_IM;
+    mem[0xFFFD] = 0x42;
+//prog end
+
     cpu.execute(2, mem);
 
     return 0;
