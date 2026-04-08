@@ -18,19 +18,23 @@ public:
 
 TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
     //given
-    mem[0xFFFC] = CPU::INS_JSR;
-    mem[0xFFFD] = 0x42;
-    mem[0xFFFE] = 0x42;
-    mem[0x4242] = CPU::INS_LDA_IM;
-    mem[0x4243] = 0x84;
+    mem[0xFFFC] = CPU::INS_LDA_IM;
+    mem[0xFFFD] = 0x84;
 
-    // std::cout << "mem[0x4242] before execute: 0x" << std::hex << (int)mem[0x4242] << std::dec << std::endl;
-    // std::cout << "PC before execute: 0x" << std::hex << cpu.program_counter << std::dec << std::endl;
     //when
-    cpu.execute(9, mem);
+    CPU cpu_copy = cpu;
+    cpu.execute(2, mem);
 
     //then
     EXPECT_EQ(cpu.A, 0x84);
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    EXPECT_EQ(cpu.C, cpu_copy.C);
+    EXPECT_EQ(cpu.I, cpu_copy.I);
+    EXPECT_EQ(cpu.D, cpu_copy.D);
+    EXPECT_EQ(cpu.B, cpu_copy.B);
+    EXPECT_EQ(cpu.V, cpu_copy.V);
 }
 
 TEST_F(general_test, LDAZeroPageCanLoadValueIntoRegisterA) {
@@ -40,10 +44,19 @@ TEST_F(general_test, LDAZeroPageCanLoadValueIntoRegisterA) {
     mem[0x0042] = 0x37;
 
     //when
+    CPU cpu_copy = cpu;
     cpu.execute(3, mem);
 
     //then
     EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    EXPECT_EQ(cpu.C, cpu_copy.C);
+    EXPECT_EQ(cpu.I, cpu_copy.I);
+    EXPECT_EQ(cpu.D, cpu_copy.D);
+    EXPECT_EQ(cpu.B, cpu_copy.B);
+    EXPECT_EQ(cpu.V, cpu_copy.V);
 }
 
 TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterA) {
@@ -54,8 +67,40 @@ TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterA) {
     mem[0x0047] = 0x37;
 
     //when
+    CPU cpu_copy = cpu;
     cpu.execute(4, mem);
 
     //then
     EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    EXPECT_EQ(cpu.C, cpu_copy.C);
+    EXPECT_EQ(cpu.I, cpu_copy.I);
+    EXPECT_EQ(cpu.D, cpu_copy.D);
+    EXPECT_EQ(cpu.B, cpu_copy.B);
+    EXPECT_EQ(cpu.V, cpu_copy.V);
+}
+
+TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
+    //given
+    cpu.X = 0xFF;
+    mem[0xFFFC] = CPU::INS_LDA_ZPX;
+    mem[0xFFFD] = 0x80;
+    mem[0x007F] = 0x37;
+
+    //when
+    CPU cpu_copy = cpu;
+    cpu.execute(4, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    EXPECT_EQ(cpu.C, cpu_copy.C);
+    EXPECT_EQ(cpu.I, cpu_copy.I);
+    EXPECT_EQ(cpu.D, cpu_copy.D);
+    EXPECT_EQ(cpu.B, cpu_copy.B);
+    EXPECT_EQ(cpu.V, cpu_copy.V);
 }
