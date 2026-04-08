@@ -28,7 +28,7 @@ struct Memory {
         return data[address];
     }
 
-    void write_word(word value, u32 address, u32& cycles) {
+    void write_word(word value, u32 address, s32& cycles) {
         data[address]       = value & 0xFF;
         data[address + 1]   = (value >> 8);
         cycles -= 2;
@@ -68,7 +68,7 @@ struct CPU {
         mem.init();
     }
 
-    byte fetch_byte(u32& cycles, Memory& mem) {
+    byte fetch_byte(s32& cycles, Memory& mem) {
         byte data = mem[program_counter];
         program_counter++;
         cycles--;
@@ -76,14 +76,14 @@ struct CPU {
         return data;
     }
 
-    byte read_byte(byte address, u32& cycles, Memory& mem) {
+    byte read_byte(byte address, s32& cycles, Memory& mem) {
         byte data = mem[address];
         cycles--;
         return data;
     }
 
     //6502 is little endian
-    word fetch_word(u32& cycles, Memory& mem) {
+    word fetch_word(s32& cycles, Memory& mem) {
         word data = mem[program_counter];
         program_counter++;
 
@@ -94,13 +94,12 @@ struct CPU {
     }
    
     //returns the number of cycles used
-    u32 execute(u32 cycles, Memory& mem) { 
-        const u32 req_cycles = cycles;
+    u32 execute(s32 cycles, Memory& mem) { 
+        const s32 req_cycles = cycles;
 
         while(cycles > 0) {
-            // std::println("Fetching opcode at PC = 0x{:04X}, value = 0x{:02X}", program_counter, mem[program_counter]);
             byte instruction = fetch_byte(cycles, mem);
-            // ()
+
             switch(instruction) {
                 case INS_LDA_IM: {
                     byte value = fetch_byte(cycles, mem);
@@ -115,24 +114,16 @@ struct CPU {
                 case INS_LDA_ZPX: {
                     byte zero_page_addr = fetch_byte(cycles, mem);
                     zero_page_addr += X;
-                 //        std::println("LDA_ZPX: zp_addr after offset = 0x{:02X}, X = 0x{:02X}, value at that addr = 0x{:02X}", 
-                 // zero_page_addr, X, mem[zero_page_addr]);
                     cycles--;
                     A = read_byte(zero_page_addr, cycles, mem);
                     lda_set_status();
                 } break;
                 case INS_JSR: {
-                    // std::println("before JSR: PC = 0x{:04X}, SP = 0x{:02X}", program_counter, (u32)stack_pointer);
                     word sub_addr = fetch_word(cycles, mem);
-                    // std::println("After fetch_word: PC = 0x{:04X}, sub_addr = 0x{:04X}", program_counter, sub_addr);
-                    // std::println("Pushing to address: 0x{:04X}, value: 0x{:04X}", 0x0100 | stack_pointer, program_counter);
-
                     mem.write_word(program_counter -1, 0x0100 | stack_pointer, cycles);
 
-                    // std::println("after push: SP = 0x{:02X}", (u32)stack_pointer);
                     program_counter = sub_addr;
                     stack_pointer--;
-                    // std::println("after JSR complete: PC = 0x{:04X}, SP = 0x{:02X}", program_counter -1, (u32)stack_pointer);
               } break;
                 default:
                   std::println("Instruction not handled: {}!", instruction);

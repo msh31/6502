@@ -24,6 +24,33 @@ static void verify_unmodified_flags_lda(const CPU& cpu, const CPU& cpu_copy) {
     EXPECT_EQ(cpu.V, cpu_copy.V);
 }
 
+TEST_F(general_test, DoNothingWhenExecutingZeroCycles) {
+    constexpr s32 NUM_CYCLES = 0;
+
+    s32 cycles_used = cpu.execute(NUM_CYCLES, mem);
+
+    EXPECT_EQ(cycles_used, 0);
+}
+
+TEST_F(general_test, CPUCanExecuteMoreCyclesThanRequestedIfRequiredByTheInstruction) {
+    //given
+    mem[0xFFFC] = CPU::INS_LDA_IM;
+    mem[0xFFFD] = 0x84;
+
+    //when
+    CPU cpu_copy = cpu;
+    s32 cycles_used = cpu.execute(1, mem); //explicitly set to 1 for testing!
+
+    //then
+    EXPECT_EQ(cpu.A, 0x84);
+    EXPECT_EQ(cycles_used, 2);
+
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_TRUE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
 TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
     //given
     mem[0xFFFC] = CPU::INS_LDA_IM;
