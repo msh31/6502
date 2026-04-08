@@ -4,6 +4,7 @@
 using byte = unsigned char;     //8-bit
 using word = unsigned short;    //16-bit
 using u32 = unsigned int;
+using s32 = signed int;
 
 struct Memory {
     static constexpr u32 MAX_MEMORY = 1024 * 64;
@@ -91,8 +92,11 @@ struct CPU {
         cycles -= 2;
         return data;
     }
-    
-    void execute(u32 cycles, Memory& mem) { 
+   
+    //returns the number of cycles used
+    u32 execute(u32 cycles, Memory& mem) { 
+        const u32 req_cycles = cycles;
+
         while(cycles > 0) {
             // std::println("Fetching opcode at PC = 0x{:04X}, value = 0x{:02X}", program_counter, mem[program_counter]);
             byte instruction = fetch_byte(cycles, mem);
@@ -135,5 +139,6 @@ struct CPU {
                 break;
             }
         }
+        return req_cycles - cycles;
     }
 };

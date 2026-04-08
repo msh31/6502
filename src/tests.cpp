@@ -23,10 +23,12 @@ TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
 
     //when
     CPU cpu_copy = cpu;
-    cpu.execute(2, mem);
+    s32 cycles_used = cpu.execute(2, mem);
 
     //then
     EXPECT_EQ(cpu.A, 0x84);
+    EXPECT_EQ(cycles_used, 2);
+
     EXPECT_FALSE(cpu.Z);
     EXPECT_TRUE(cpu.N);
 
@@ -35,6 +37,7 @@ TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
     EXPECT_EQ(cpu.D, cpu_copy.D);
     EXPECT_EQ(cpu.B, cpu_copy.B);
     EXPECT_EQ(cpu.V, cpu_copy.V);
+    EXPECT_EQ(cycles_used, 2);
 }
 
 TEST_F(general_test, LDAZeroPageCanLoadValueIntoRegisterA) {
@@ -45,10 +48,12 @@ TEST_F(general_test, LDAZeroPageCanLoadValueIntoRegisterA) {
 
     //when
     CPU cpu_copy = cpu;
-    cpu.execute(3, mem);
+    s32 cycles_used = cpu.execute(3, mem);
 
     //then
     EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, 3);
+
     EXPECT_FALSE(cpu.Z);
     EXPECT_FALSE(cpu.N);
 
@@ -68,10 +73,12 @@ TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterA) {
 
     //when
     CPU cpu_copy = cpu;
-    cpu.execute(4, mem);
+    s32 cycles_used = cpu.execute(4, mem);
 
     //then
     EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, 4);
+
     EXPECT_FALSE(cpu.Z);
     EXPECT_FALSE(cpu.N);
 
@@ -91,10 +98,12 @@ TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
 
     //when
     CPU cpu_copy = cpu;
-    cpu.execute(4, mem);
+    s32 cycles_used = cpu.execute(4, mem);
 
     //then
     EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, 4);
+
     EXPECT_FALSE(cpu.Z);
     EXPECT_FALSE(cpu.N);
 
