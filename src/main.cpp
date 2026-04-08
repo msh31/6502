@@ -1,24 +1,7 @@
-#include "emulator.hpp"
-#include "gtest/gtest.h"
+// #include "emulator.hpp"
 
-#if 0 
-int main() {
-    Memory mem;
-    CPU cpu;
-    cpu.reset(mem);
-
-//prog start
-    mem[0xFFFC] = CPU::INS_JSR;
-    mem[0xFFFD] = 0x42;
-    mem[0xFFFE] = 0x42;
-    mem[0x4242] = CPU::INS_LDA_IM;
-    mem[0x4243] = 0x84;
-//prog end
-
-    cpu.execute(9, mem);
-    return 0;
-}
-#endif
+// #if 0
+#include <gtest/gtest.h>
 
 #if defined(GTEST_OS_ESP8266) || defined(GTEST_OS_ESP32) || \
     (defined(GTEST_OS_NRF52) && defined(ARDUINO))
@@ -28,9 +11,9 @@ int main() {
 extern "C" {
 #endif
 
-void setup() { testing::InitGoogleTest(); }
+    void setup() { testing::InitGoogleTest(); }
 
-void loop() { RUN_ALL_TESTS(); }
+    void loop() { RUN_ALL_TESTS(); }
 
 #ifdef GTEST_OS_ESP8266
 }
@@ -40,16 +23,32 @@ void loop() { RUN_ALL_TESTS(); }
 // QuRT: program entry point is main, but argc/argv are unusable.
 
 GTEST_API_ int main() {
-  printf("Running main() from %s\n", __FILE__);
-  testing::InitGoogleTest();
-  return RUN_ALL_TESTS();
+    printf("Running main() from %s\n", __FILE__);
+    testing::InitGoogleTest();
+    return RUN_ALL_TESTS();
 }
 #else
 // Normal platforms: program entry point is main, argc/argv are initialized.
 
 GTEST_API_ int main(int argc, char **argv) {
-  printf("Running main() from %s\n", __FILE__);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    printf("Running main() from %s\n", __FILE__);
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
 #endif
+// #endif
+//
+// int main() {
+//     Memory mem;
+//     CPU cpu;
+//     cpu.reset(mem);
+//
+//     mem[0xFFFC] = CPU::INS_JSR;
+//     mem[0xFFFD] = 0x42;
+//     mem[0xFFFE] = 0x42;
+//     mem[0x4242] = CPU::INS_LDA_IM;
+//     mem[0x4243] = 0x84;
+//
+//     cpu.execute(9, mem);
+//     return 0;
+// }

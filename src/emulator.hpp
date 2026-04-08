@@ -1,4 +1,5 @@
-#include <stdio.h>
+#pragma once
+#include <print>
 
 using byte = unsigned char;     //8-bit
 using word = unsigned short;    //16-bit
@@ -35,7 +36,7 @@ struct Memory {
 
 struct CPU {
     word program_counter;
-    word stack_pointer;
+    byte stack_pointer;
 
     byte A, X, Y;                   //registers
 
@@ -60,7 +61,7 @@ struct CPU {
 
     void reset(Memory& mem) {
         program_counter = 0xFFFC;
-        stack_pointer = 0x0100;
+        stack_pointer = 0xFF;
         C = Z = I = D = B = V = N = 0;
         A = X = Y = 0;
         mem.init();
@@ -86,13 +87,14 @@ struct CPU {
         program_counter++;
 
         data |= (mem[program_counter] << 8);
-        program_counter++;
+        // program_counter++;
         cycles -= 2;
         return data;
     }
     
     void execute(u32 cycles, Memory& mem) { 
         while(cycles > 0) {
+            // std::println("Fetching opcode at PC = 0x{:04X}, value = 0x{:02X}", program_counter, mem[program_counter]);
             byte instruction = fetch_byte(cycles, mem);
             // ()
             switch(instruction) {
@@ -114,15 +116,21 @@ struct CPU {
                     lda_set_status();
                 } break;
                 case INS_JSR: {
+                    // std::println("before JSR: PC = 0x{:04X}, SP = 0x{:02X}", program_counter, (u32)stack_pointer);
                     word sub_addr = fetch_word(cycles, mem);
-                    mem.write_word(program_counter - 1, stack_pointer, cycles);
+                    // std::println("After fetch_word: PC = 0x{:04X}, sub_addr = 0x{:04X}", program_counter, sub_addr);
+                    // std::println("Pushing to address: 0x{:04X}, value: 0x{:04X}", 0x0100 | stack_pointer, program_counter);
+
+                    mem.write_word(program_counter -1, 0x0100 | stack_pointer, cycles);
+
+                    // std::println("after push: SP = 0x{:02X}", (u32)stack_pointer);
                     program_counter = sub_addr;
-                    cycles--;
-                    stack_pointer++;
-                } break;
+                    stack_pointer--;
+                    // std::println("after JSR complete: PC = 0x{:04X}, SP = 0x{:02X}", program_counter -1, (u32)stack_pointer);
+              } break;
                 default:
-                    printf("Instruction not handled: %d!", instruction);
-                    break;
+                  std::println("Instruction not handled: {}!", instruction);
+                break;
             }
         }
     }

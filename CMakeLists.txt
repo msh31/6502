@@ -56,6 +56,7 @@ set(6502_emulator_SOURCES
 	cmake.toml
 	"src/emulator.hpp"
 	"src/main.cpp"
+	"src/tests.cpp"
 )
 
 add_executable(6502_emulator)
@@ -64,7 +65,7 @@ target_sources(6502_emulator PRIVATE ${6502_emulator_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${6502_emulator_SOURCES})
 
 target_compile_features(6502_emulator PRIVATE
-	cxx_std_17
+	cxx_std_23
 )
 
 target_link_libraries(6502_emulator PRIVATE

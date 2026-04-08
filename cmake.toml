@@ -16,5 +16,5 @@ CMAKE_EXPORT_COMPILE_COMMANDS = true
 [target.6502_emulator]
 type = "executable" # static, shared
 sources = ["src/**.cpp", "src/**.hpp"]
-compile-features = ["cxx_std_17"]
+compile-features = ["cxx_std_23"]
 link-libraries = ["GTest::gtest_main"]
