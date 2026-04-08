@@ -25,6 +25,12 @@ struct Memory {
     byte& operator[](u32 address) {
         return data[address];
     }
+
+    void write_word(word value, u32 address, u32& cycles) {
+        data[address]       = value & 0xFF;
+        data[address + 1]   = (value >> 8);
+        cycles -= 2;
+    }
 };
 
 struct CPU {
@@ -44,7 +50,8 @@ struct CPU {
     static constexpr byte
         INS_LDA_IM = 0xA9,
         INS_LDA_ZP = 0xA5,
-        INS_LDA_ZPX = 0xB5;
+        INS_LDA_ZPX = 0xB5,
+        INS_JSR = 0x20;
 
     void lda_set_status() {
         Z = (A==0);
@@ -73,6 +80,17 @@ struct CPU {
         return data;
     }
 
+    //6502 is little endian
+    word fetch_word(u32& cycles, Memory& mem) {
+        word data = mem[program_counter];
+        program_counter++;
+
+        data |= (mem[program_counter] << 8);
+        program_counter++;
+        cycles -= 2;
+        return data;
+    }
+    
     void execute(u32 cycles, Memory& mem) { 
         while(cycles > 0) {
             byte instruction = fetch_byte(cycles, mem);
@@ -95,6 +113,13 @@ struct CPU {
                     A = read_byte(zero_page_addr, cycles, mem);
                     lda_set_status();
                 } break;
+                case INS_JSR: {
+                    word sub_addr = fetch_word(cycles, mem);
+                    mem.write_word(program_counter - 1, stack_pointer, cycles);
+                    program_counter = sub_addr;
+                    cycles--;
+                    stack_pointer++;
+                } break;
                 default:
                     printf("Instruction not handled: %d!", instruction);
                     break;
@@ -107,13 +132,16 @@ int main() {
     Memory mem;
     CPU cpu;
     cpu.reset(mem);
+
 //prog start
-    mem[0xFFFC] = CPU::INS_LDA_ZP;
+    mem[0xFFFC] = CPU::INS_JSR;
     mem[0xFFFD] = 0x42;
-    mem[0x0042] = 0x84;
+    mem[0xFFFE] = 0x42;
+    mem[0x4242] = CPU::INS_LDA_IM;
+    mem[0x4243] = 0x84;
 //prog end
 
-    cpu.execute(3, mem);
+    cpu.execute(9, mem);
 
     return 0;
 }
