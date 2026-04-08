@@ -28,7 +28,7 @@ TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
     //then
     EXPECT_EQ(cpu.A, 0x84);
     EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_TRUE(cpu.N);
 
     EXPECT_EQ(cpu.C, cpu_copy.C);
     EXPECT_EQ(cpu.I, cpu_copy.I);
