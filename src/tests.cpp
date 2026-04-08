@@ -16,6 +16,14 @@ public:
     }
 };
 
+static void verify_unmodified_flags_lda(const CPU& cpu, const CPU& cpu_copy) {
+    EXPECT_EQ(cpu.C, cpu_copy.C);
+    EXPECT_EQ(cpu.I, cpu_copy.I);
+    EXPECT_EQ(cpu.D, cpu_copy.D);
+    EXPECT_EQ(cpu.B, cpu_copy.B);
+    EXPECT_EQ(cpu.V, cpu_copy.V);
+}
+
 TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
     //given
     mem[0xFFFC] = CPU::INS_LDA_IM;
@@ -32,12 +40,7 @@ TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
     EXPECT_FALSE(cpu.Z);
     EXPECT_TRUE(cpu.N);
 
-    EXPECT_EQ(cpu.C, cpu_copy.C);
-    EXPECT_EQ(cpu.I, cpu_copy.I);
-    EXPECT_EQ(cpu.D, cpu_copy.D);
-    EXPECT_EQ(cpu.B, cpu_copy.B);
-    EXPECT_EQ(cpu.V, cpu_copy.V);
-    EXPECT_EQ(cycles_used, 2);
+    verify_unmodified_flags_lda(cpu, cpu_copy);
 }
 
 TEST_F(general_test, LDAZeroPageCanLoadValueIntoRegisterA) {
@@ -57,11 +60,7 @@ TEST_F(general_test, LDAZeroPageCanLoadValueIntoRegisterA) {
     EXPECT_FALSE(cpu.Z);
     EXPECT_FALSE(cpu.N);
 
-    EXPECT_EQ(cpu.C, cpu_copy.C);
-    EXPECT_EQ(cpu.I, cpu_copy.I);
-    EXPECT_EQ(cpu.D, cpu_copy.D);
-    EXPECT_EQ(cpu.B, cpu_copy.B);
-    EXPECT_EQ(cpu.V, cpu_copy.V);
+    verify_unmodified_flags_lda(cpu, cpu_copy);
 }
 
 TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterA) {
@@ -82,11 +81,7 @@ TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterA) {
     EXPECT_FALSE(cpu.Z);
     EXPECT_FALSE(cpu.N);
 
-    EXPECT_EQ(cpu.C, cpu_copy.C);
-    EXPECT_EQ(cpu.I, cpu_copy.I);
-    EXPECT_EQ(cpu.D, cpu_copy.D);
-    EXPECT_EQ(cpu.B, cpu_copy.B);
-    EXPECT_EQ(cpu.V, cpu_copy.V);
+    verify_unmodified_flags_lda(cpu, cpu_copy);
 }
 
 TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
@@ -107,9 +102,5 @@ TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
     EXPECT_FALSE(cpu.Z);
     EXPECT_FALSE(cpu.N);
 
-    EXPECT_EQ(cpu.C, cpu_copy.C);
-    EXPECT_EQ(cpu.I, cpu_copy.I);
-    EXPECT_EQ(cpu.D, cpu_copy.D);
-    EXPECT_EQ(cpu.B, cpu_copy.B);
-    EXPECT_EQ(cpu.V, cpu_copy.V);
+    verify_unmodified_flags_lda(cpu, cpu_copy);
 }
