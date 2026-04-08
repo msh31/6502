@@ -53,6 +53,7 @@ struct CPU {
         INS_LDA_IM = 0xA9,
         INS_LDA_ZP = 0xA5,
         INS_LDA_ZPX = 0xB5,
+        INS_LDA_ABS = 0xAD,
         INS_JSR = 0x20;
 
     void lda_set_status() {

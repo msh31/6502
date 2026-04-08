@@ -36,19 +36,28 @@ TEST_F(general_test, CPUCanExecuteMoreCyclesThanRequestedIfRequiredByTheInstruct
     //given
     mem[0xFFFC] = CPU::INS_LDA_IM;
     mem[0xFFFD] = 0x84;
+    constexpr s32 NUM_CYCLES = 1;
 
     //when
     CPU cpu_copy = cpu;
-    s32 cycles_used = cpu.execute(1, mem); //explicitly set to 1 for testing!
+    s32 cycles_used = cpu.execute(NUM_CYCLES, mem); //explicitly set to 1 for testing!
 
     //then
-    EXPECT_EQ(cpu.A, 0x84);
     EXPECT_EQ(cycles_used, 2);
+}
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_TRUE(cpu.N);
+TEST_F(general_test, ExecutingBadInstructionDoesNotCauseInfiniteLoop) {
+    //given
+    mem[0xFFFC] = 0x00; //invalid opcode
+    mem[0xFFFD] = 0x00;
+    constexpr s32 NUM_CYCLES = 1;
 
-    verify_unmodified_flags_lda(cpu, cpu_copy);
+    //when
+    CPU cpu_copy = cpu;
+    s32 cycles_used = cpu.execute(NUM_CYCLES, mem); //explicitly set to 1 for testing!
+
+    //then
+    EXPECT_EQ(cycles_used, NUM_CYCLES);
 }
 
 TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
@@ -66,6 +75,23 @@ TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
 
     EXPECT_FALSE(cpu.Z);
     EXPECT_TRUE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
+TEST_F(general_test, LDAImmediateCanAffectZeroFlag) {
+    //given
+    cpu.A = 0x44;
+    mem[0xFFFC] = CPU::INS_LDA_IM;
+    mem[0xFFFD] = 0x0;
+
+    //when
+    CPU cpu_copy = cpu;
+    s32 cycles_used = cpu.execute(2, mem);
+
+    //then
+    EXPECT_TRUE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
 
     verify_unmodified_flags_lda(cpu, cpu_copy);
 }
@@ -125,6 +151,27 @@ TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
     //then
     EXPECT_EQ(cpu.A, 0x37);
     EXPECT_EQ(cycles_used, 4);
+
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
+TEST_F(general_test, LDAAbsoluteCanLoadValueIntoRegisterA) {
+    mem[0xFFFC] = CPU::INS_LDA_ABS;
+    mem[0xFFFD] = 0x80;
+    mem[0xFFFE] = 0x40; //0x4480
+    mem[0x4480] = 0x37;
+
+    //when
+    CPU cpu_copy = cpu;
+    s32 cycles_used = cpu.execute(4, mem);
+    constexpr s32 EXPECTED_CYCLES = 4;
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
 
     EXPECT_FALSE(cpu.Z);
     EXPECT_FALSE(cpu.N);
