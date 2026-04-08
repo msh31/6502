@@ -76,7 +76,7 @@ struct CPU {
     }
 
     byte read_byte(byte address, u32& cycles, Memory& mem) {
-        byte data = mem[program_counter];
+        byte data = mem[address];
         cycles--;
         return data;
     }
@@ -111,6 +111,8 @@ struct CPU {
                 case INS_LDA_ZPX: {
                     byte zero_page_addr = fetch_byte(cycles, mem);
                     zero_page_addr += X;
+                 //        std::println("LDA_ZPX: zp_addr after offset = 0x{:02X}, X = 0x{:02X}, value at that addr = 0x{:02X}", 
+                 // zero_page_addr, X, mem[zero_page_addr]);
                     cycles--;
                     A = read_byte(zero_page_addr, cycles, mem);
                     lda_set_status();
