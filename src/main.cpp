@@ -42,7 +42,14 @@ struct CPU {
     byte N : 1;
 
     static constexpr byte
-        INS_LDA_IM = 0xA9;
+        INS_LDA_IM = 0xA9,
+        INS_LDA_ZP = 0xA5,
+        INS_LDA_ZPX = 0xB5;
+
+    void lda_set_status() {
+        Z = (A==0);
+        N = (A & 0b10000000) > 0;
+    }
 
     void reset(Memory& mem) {
         program_counter = 0xFFFC;
@@ -60,6 +67,12 @@ struct CPU {
         return data;
     }
 
+    byte read_byte(byte address, u32& cycles, Memory& mem) {
+        byte data = mem[program_counter];
+        cycles--;
+        return data;
+    }
+
     void execute(u32 cycles, Memory& mem) { 
         while(cycles > 0) {
             byte instruction = fetch_byte(cycles, mem);
@@ -68,10 +81,20 @@ struct CPU {
                 case INS_LDA_IM: {
                     byte value = fetch_byte(cycles, mem);
                     A = value;
-                    Z = (A==0);
-                    N = (A & 0b10000000) > 0;
-                    break;
-                 }
+                    lda_set_status();
+                } break;
+                case INS_LDA_ZP: {
+                    byte zero_page_addr = fetch_byte(cycles, mem);
+                    A = read_byte(zero_page_addr, cycles, mem);
+                    lda_set_status();
+                } break;
+                case INS_LDA_ZPX: {
+                    byte zero_page_addr = fetch_byte(cycles, mem);
+                    zero_page_addr += X;
+                    cycles--;
+                    A = read_byte(zero_page_addr, cycles, mem);
+                    lda_set_status();
+                } break;
                 default:
                     printf("Instruction not handled: %d!", instruction);
                     break;
@@ -85,11 +108,12 @@ int main() {
     CPU cpu;
     cpu.reset(mem);
 //prog start
-    mem[0xFFFC] = CPU::INS_LDA_IM;
+    mem[0xFFFC] = CPU::INS_LDA_ZP;
     mem[0xFFFD] = 0x42;
+    mem[0x0042] = 0x84;
 //prog end
 
-    cpu.execute(2, mem);
+    cpu.execute(3, mem);
 
     return 0;
 }
