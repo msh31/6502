@@ -166,8 +166,166 @@ TEST_F(general_test, LDAAbsoluteCanLoadValueIntoRegisterA) {
 
     //when
     CPU cpu_copy = cpu;
-    s32 cycles_used = cpu.execute(4, mem);
     constexpr s32 EXPECTED_CYCLES = 4;
+    s32 cycles_used = cpu.execute(EXPECTED_CYCLES, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
+
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
+TEST_F(general_test, LDAAbsoluteXCanLoadValueIntoRegisterA) {
+    cpu.X = 1;
+    mem[0xFFFC] = CPU::INS_LDA_ABSX;
+    mem[0xFFFD] = 0x80;
+    mem[0xFFFE] = 0x44; //0x4480
+    mem[0x4481] = 0x37;
+
+    //when
+    CPU cpu_copy = cpu;
+    constexpr s32 EXPECTED_CYCLES = 4;
+    s32 cycles_used = cpu.execute(EXPECTED_CYCLES, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
+
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
+TEST_F(general_test, LDAAbsoluteXCanLoadValueIntoRegisterAWhenBoundsCrossing) {
+    cpu.X = 0xFF;
+    mem[0xFFFC] = CPU::INS_LDA_ABSX;
+    mem[0xFFFD] = 0x02;
+    mem[0xFFFE] = 0x44; //0x4402
+    mem[0x4501] = 0x37; //0x4402+0xFF crosses page boundary
+
+    //when
+    CPU cpu_copy = cpu;
+    constexpr s32 EXPECTED_CYCLES = 5;
+    s32 cycles_used = cpu.execute(EXPECTED_CYCLES, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
+
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
+TEST_F(general_test, LDAAbsoluteYCanLoadValueIntoRegisterA) {
+    cpu.X = 1;
+    mem[0xFFFC] = CPU::INS_LDA_ABSY;
+    mem[0xFFFD] = 0x80;
+    mem[0xFFFE] = 0x44; //0x4480
+    mem[0x4481] = 0x37;
+
+    //when
+    CPU cpu_copy = cpu;
+    constexpr s32 EXPECTED_CYCLES = 4;
+    s32 cycles_used = cpu.execute(EXPECTED_CYCLES, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
+
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
+TEST_F(general_test, LDAAbsoluteYCanLoadValueIntoRegisterAWhenBoundsCrossing) {
+    cpu.X = 0xFF;
+    mem[0xFFFC] = CPU::INS_LDA_ABSY;
+    mem[0xFFFD] = 0x02;
+    mem[0xFFFE] = 0x44; //0x4402
+    mem[0x4501] = 0x37; //0x4402+0xFF crosses page boundary
+
+    //when
+    CPU cpu_copy = cpu;
+    constexpr s32 EXPECTED_CYCLES = 5;
+    s32 cycles_used = cpu.execute(EXPECTED_CYCLES, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
+
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
+TEST_F(general_test, LDAIndirectXCanLoadValueIntoRegisterA) {
+    cpu.X = 0x04;
+    mem[0xFFFC] = CPU::INS_LDA_INDX;
+    mem[0xFFFD] = 0x02;
+    mem[0x0006] = 0x00; //0x02 + 0x4
+    mem[0x0007] = 0x80; 
+    mem[0x8000] = 0x37; 
+
+    //when
+    CPU cpu_copy = cpu;
+    constexpr s32 EXPECTED_CYCLES = 6;
+    s32 cycles_used = cpu.execute(EXPECTED_CYCLES, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
+
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
+
+TEST_F(general_test, LDAIndirectYCanLoadValueIntoRegisterA) {
+    cpu.Y = 0x04;
+    mem[0xFFFC] = CPU::INS_LDA_INDY;
+    mem[0xFFFD] = 0x02;
+    mem[0x0002] = 0x00;
+    mem[0x0003] = 0x80; 
+    mem[0x8004] = 0x37;  //0x8000+ 0x4
+
+    //when
+    CPU cpu_copy = cpu;
+    constexpr s32 EXPECTED_CYCLES = 5;
+    s32 cycles_used = cpu.execute(EXPECTED_CYCLES, mem);
+
+    //then
+    EXPECT_EQ(cpu.A, 0x37);
+    EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
+
+    EXPECT_FALSE(cpu.Z);
+    EXPECT_FALSE(cpu.N);
+
+    verify_unmodified_flags_lda(cpu, cpu_copy);
+}
+
+TEST_F(general_test, LDAIndirectYCanLoadValueIntoRegisterAWhenBoundsCrossing) {
+    cpu.Y = 0xFF;
+    mem[0xFFFC] = CPU::INS_LDA_INDY;
+    mem[0xFFFD] = 0x02;
+    mem[0x0002] = 0x02;
+    mem[0x0003] = 0x80; 
+    mem[0x8101] = 0x37;  //0x8002 + 0xFF
+
+    //when
+    CPU cpu_copy = cpu;
+    constexpr s32 EXPECTED_CYCLES = 6;
+    s32 cycles_used = cpu.execute(EXPECTED_CYCLES, mem);
 
     //then
     EXPECT_EQ(cpu.A, 0x37);
