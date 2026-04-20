@@ -3,7 +3,7 @@
 
 using namespace emulator;
 
-class general_test : public testing::Test {
+class load_tests : public testing::Test {
 public:
     Memory mem;
     CPU cpu;
@@ -36,7 +36,7 @@ static void verify_unmodified_flags_from_load_register(const CPU& cpu, const CPU
     EXPECT_EQ(cpu.V, cpu_copy.V);
 }
 
-TEST_F(general_test, DoNothingWhenExecutingZeroCycles) {
+TEST_F(load_tests, DoNothingWhenExecutingZeroCycles) {
     constexpr s32 NUM_CYCLES = 0;
 
     s32 cycles_used = cpu.execute(NUM_CYCLES, mem);
@@ -44,7 +44,7 @@ TEST_F(general_test, DoNothingWhenExecutingZeroCycles) {
     EXPECT_EQ(cycles_used, 0);
 }
 
-TEST_F(general_test, CPUCanExecuteMoreCyclesThanRequestedIfRequiredByTheInstruction) {
+TEST_F(load_tests, CPUCanExecuteMoreCyclesThanRequestedIfRequiredByTheInstruction) {
     //given
     mem[0xFFFC] = CPU::INS_LDA_IM;
     mem[0xFFFD] = 0x84;
@@ -58,7 +58,7 @@ TEST_F(general_test, CPUCanExecuteMoreCyclesThanRequestedIfRequiredByTheInstruct
     EXPECT_EQ(cycles_used, 2);
 }
 
-void general_test::test_load_register_immediate(byte opcode, byte CPU::*reg) {
+void load_tests::test_load_register_immediate(byte opcode, byte CPU::*reg) {
     mem[0xFFFC] = opcode;
     mem[0xFFFD] = 0x84;
 
@@ -73,7 +73,7 @@ void general_test::test_load_register_immediate(byte opcode, byte CPU::*reg) {
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-void general_test::test_load_register_zero_page(byte opcode, byte emulator::CPU::*reg) {
+void load_tests::test_load_register_zero_page(byte opcode, byte emulator::CPU::*reg) {
     //given
     mem[0xFFFC] = opcode;
     mem[0xFFFD] = 0x42;
@@ -93,7 +93,7 @@ void general_test::test_load_register_zero_page(byte opcode, byte emulator::CPU:
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-void general_test::test_load_register_zero_page_x(byte opcode, byte emulator::CPU::*reg) {
+void load_tests::test_load_register_zero_page_x(byte opcode, byte emulator::CPU::*reg) {
     //given
     cpu.X = 5;
     mem[0xFFFC] = opcode;
@@ -114,7 +114,7 @@ void general_test::test_load_register_zero_page_x(byte opcode, byte emulator::CP
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-void general_test::test_load_register_zero_page_y(byte opcode, byte emulator::CPU::*reg) {
+void load_tests::test_load_register_zero_page_y(byte opcode, byte emulator::CPU::*reg) {
     //given
     cpu.Y = 5;
     mem[0xFFFC] = opcode;
@@ -135,7 +135,7 @@ void general_test::test_load_register_zero_page_y(byte opcode, byte emulator::CP
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-void general_test::test_load_register_absolute(byte opcode, byte emulator::CPU::*reg) {
+void load_tests::test_load_register_absolute(byte opcode, byte emulator::CPU::*reg) {
     cpu.Z = cpu.N = true;
 
     mem[0xFFFC] = opcode;
@@ -158,7 +158,7 @@ void general_test::test_load_register_absolute(byte opcode, byte emulator::CPU::
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-void general_test::test_load_register_absolute_x(byte opcode, byte emulator::CPU::*reg) {
+void load_tests::test_load_register_absolute_x(byte opcode, byte emulator::CPU::*reg) {
     cpu.Z = cpu.N = true;
 
     cpu.X = 1;
@@ -182,7 +182,7 @@ void general_test::test_load_register_absolute_x(byte opcode, byte emulator::CPU
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-void general_test::test_load_register_absolute_y(byte opcode, byte emulator::CPU::*reg) {
+void load_tests::test_load_register_absolute_y(byte opcode, byte emulator::CPU::*reg) {
     cpu.Z = cpu.N = true;
 
     cpu.Y = 1;
@@ -206,7 +206,7 @@ void general_test::test_load_register_absolute_y(byte opcode, byte emulator::CPU
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-void general_test::test_load_register_absolute_x_crossing(byte opcode, byte emulator::CPU::*reg) {
+void load_tests::test_load_register_absolute_x_crossing(byte opcode, byte emulator::CPU::*reg) {
     cpu.X = 0xFF;
     mem[0xFFFC] = opcode;
     mem[0xFFFD] = 0x02;
@@ -228,7 +228,7 @@ void general_test::test_load_register_absolute_x_crossing(byte opcode, byte emul
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-void general_test::test_load_register_absolute_y_crossing(byte opcode, byte emulator::CPU::*reg) {
+void load_tests::test_load_register_absolute_y_crossing(byte opcode, byte emulator::CPU::*reg) {
     cpu.Y = 0xFF;
     mem[0xFFFC] = opcode;
     mem[0xFFFD] = 0x02;
@@ -252,17 +252,17 @@ void general_test::test_load_register_absolute_y_crossing(byte opcode, byte emul
 
 //actual testing
 
-TEST_F(general_test, LDAImmediateCanLoadValueIntoRegisterA) {
+TEST_F(load_tests, LDAImmediateCanLoadValueIntoRegisterA) {
     test_load_register_immediate(CPU::INS_LDA_IM, &CPU::A);
 }
-TEST_F(general_test, LDXImmediateCanLoadValueIntoRegisterX) {
+TEST_F(load_tests, LDXImmediateCanLoadValueIntoRegisterX) {
     test_load_register_immediate(CPU::INS_LDX_IM, &CPU::X);
 }
-TEST_F(general_test, LDYImmediateCanLoadValueIntoRegisterY) {
+TEST_F(load_tests, LDYImmediateCanLoadValueIntoRegisterY) {
     test_load_register_immediate(CPU::INS_LDY_IM, &CPU::Y);
 }
 
-TEST_F(general_test, LDAImmediateCanAffectZeroFlag) {
+TEST_F(load_tests, LDAImmediateCanAffectZeroFlag) {
     //given
     cpu.A = 0x44;
     mem[0xFFFC] = CPU::INS_LDA_IM;
@@ -279,27 +279,27 @@ TEST_F(general_test, LDAImmediateCanAffectZeroFlag) {
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-TEST_F(general_test, LDAZeroPageCanLoadValueIntoRegisterA) {
+TEST_F(load_tests, LDAZeroPageCanLoadValueIntoRegisterA) {
     test_load_register_zero_page(CPU::INS_LDA_ZP, &emulator::CPU::A);
 }
-TEST_F(general_test, LDXZeroPageCanLoadValueIntoRegisterX) {
+TEST_F(load_tests, LDXZeroPageCanLoadValueIntoRegisterX) {
     test_load_register_zero_page(CPU::INS_LDX_ZP, &emulator::CPU::X);
 }
-TEST_F(general_test, LDYZeroPageCanLoadValueIntoRegisterY) {
+TEST_F(load_tests, LDYZeroPageCanLoadValueIntoRegisterY) {
     test_load_register_zero_page(CPU::INS_LDY_ZP, &emulator::CPU::Y);
 }
 
-TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterA) {
+TEST_F(load_tests, LDAZeroPageXCanLoadValueIntoRegisterA) {
     test_load_register_zero_page_x(CPU::INS_LDA_ZPX, &emulator::CPU::A);
 }
-TEST_F(general_test, LDXZeroPageYCanLoadValueIntoRegisterX) {
+TEST_F(load_tests, LDXZeroPageYCanLoadValueIntoRegisterX) {
     test_load_register_zero_page_y(CPU::INS_LDX_ZPY, &emulator::CPU::X);
 }
-TEST_F(general_test, LDYZeroPageXCanLoadValueIntoRegisterY) {
+TEST_F(load_tests, LDYZeroPageXCanLoadValueIntoRegisterY) {
     test_load_register_zero_page_x(CPU::INS_LDY_ZPX, &emulator::CPU::Y);
 }
 
-TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
+TEST_F(load_tests, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
     //given
     cpu.X = 0xFF;
     mem[0xFFFC] = CPU::INS_LDA_ZPX;
@@ -320,45 +320,45 @@ TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-TEST_F(general_test, LDAAbsoluteCanLoadValueIntoRegisterA) {
+TEST_F(load_tests, LDAAbsoluteCanLoadValueIntoRegisterA) {
     test_load_register_absolute(CPU::INS_LDA_ABS, &emulator::CPU::A);
 }
-TEST_F(general_test, LDXAbsoluteCanLoadValueIntoRegisterX) {
+TEST_F(load_tests, LDXAbsoluteCanLoadValueIntoRegisterX) {
     test_load_register_absolute(CPU::INS_LDX_ABS, &emulator::CPU::X);
 }
-TEST_F(general_test, LDYAbsoluteCanLoadValueIntoRegisterY) {
+TEST_F(load_tests, LDYAbsoluteCanLoadValueIntoRegisterY) {
     test_load_register_absolute(CPU::INS_LDY_ABS, &emulator::CPU::Y);
 }
 
-TEST_F(general_test, LDAAbsoluteXCanLoadValueIntoRegisterA) {
+TEST_F(load_tests, LDAAbsoluteXCanLoadValueIntoRegisterA) {
     test_load_register_absolute_x(CPU::INS_LDA_ABSX, &emulator::CPU::A);
 }
-TEST_F(general_test, LDXAbsoluteXCanLoadValueIntoRegisterX) {
+TEST_F(load_tests, LDXAbsoluteXCanLoadValueIntoRegisterX) {
     test_load_register_absolute_y(CPU::INS_LDX_ABSY, &emulator::CPU::X);
 }
-TEST_F(general_test, LDYAbsoluteXCanLoadValueIntoRegisterY) {
+TEST_F(load_tests, LDYAbsoluteXCanLoadValueIntoRegisterY) {
     test_load_register_absolute_x(CPU::INS_LDY_ABSX, &emulator::CPU::Y);
 }
 
-TEST_F(general_test, LDAAbsoluteXCanLoadValueIntoRegisterAWhenBoundsCrossing) {
+TEST_F(load_tests, LDAAbsoluteXCanLoadValueIntoRegisterAWhenBoundsCrossing) {
     test_load_register_absolute_x_crossing(CPU::INS_LDA_ABSX, &emulator::CPU::A);
 }
-TEST_F(general_test, LDYAbsoluteXCanLoadValueIntoRegisterYWhenBoundsCrossing) {
+TEST_F(load_tests, LDYAbsoluteXCanLoadValueIntoRegisterYWhenBoundsCrossing) {
     test_load_register_absolute_x_crossing(CPU::INS_LDY_ABSX, &emulator::CPU::Y);
 }
 
-TEST_F(general_test, LDAAbsoluteYCanLoadValueIntoRegisterA) {
+TEST_F(load_tests, LDAAbsoluteYCanLoadValueIntoRegisterA) {
     test_load_register_absolute_y(CPU::INS_LDA_ABSY, &emulator::CPU::A);
 }
 
-TEST_F(general_test, LDAAbsoluteYCanLoadValueIntoRegisterAWhenBoundsCrossing) {
+TEST_F(load_tests, LDAAbsoluteYCanLoadValueIntoRegisterAWhenBoundsCrossing) {
     test_load_register_absolute_y_crossing(CPU::INS_LDA_ABSY, &emulator::CPU::A);
 }
-TEST_F(general_test, LDXAbsoluteYCanLoadValueIntoRegisterXWhenBoundsCrossing) {
+TEST_F(load_tests, LDXAbsoluteYCanLoadValueIntoRegisterXWhenBoundsCrossing) {
     test_load_register_absolute_y_crossing(CPU::INS_LDX_ABSY, &emulator::CPU::X);
 }
 
-TEST_F(general_test, LDAIndirectXCanLoadValueIntoRegisterA) {
+TEST_F(load_tests, LDAIndirectXCanLoadValueIntoRegisterA) {
     cpu.Z = cpu.N = true;
 
     cpu.X = 0x04;
@@ -384,7 +384,7 @@ TEST_F(general_test, LDAIndirectXCanLoadValueIntoRegisterA) {
 }
 
 
-TEST_F(general_test, LDAIndirectYCanLoadValueIntoRegisterA) {
+TEST_F(load_tests, LDAIndirectYCanLoadValueIntoRegisterA) {
     cpu.Z = cpu.N = true;
 
     cpu.Y = 0x04;
@@ -409,7 +409,7 @@ TEST_F(general_test, LDAIndirectYCanLoadValueIntoRegisterA) {
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
-TEST_F(general_test, LDAIndirectYCanLoadValueIntoRegisterAWhenBoundsCrossing) {
+TEST_F(load_tests, LDAIndirectYCanLoadValueIntoRegisterAWhenBoundsCrossing) {
     cpu.Y = 0xFF;
     mem[0xFFFC] = CPU::INS_LDA_INDY;
     mem[0xFFFD] = 0x02;

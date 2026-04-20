@@ -56,8 +56,9 @@ set(6502_emulator_SOURCES
 	cmake.toml
 	"src/emulator.cpp"
 	"src/emulator.hpp"
+	"src/load_tests.cpp"
 	"src/main.cpp"
-	"src/tests.cpp"
+	"src/store_tests.cpp"
 )
 
 add_executable(6502_emulator)
