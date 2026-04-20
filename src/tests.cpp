@@ -136,6 +136,8 @@ void general_test::test_load_register_zero_page_y(byte opcode, byte emulator::CP
 }
 
 void general_test::test_load_register_absolute(byte opcode, byte emulator::CPU::*reg) {
+    cpu.Z = cpu.N = true;
+
     mem[0xFFFC] = opcode;
     mem[0xFFFD] = 0x80;
     mem[0xFFFE] = 0x44; //0x4480
@@ -157,6 +159,8 @@ void general_test::test_load_register_absolute(byte opcode, byte emulator::CPU::
 }
 
 void general_test::test_load_register_absolute_x(byte opcode, byte emulator::CPU::*reg) {
+    cpu.Z = cpu.N = true;
+
     cpu.X = 1;
     mem[0xFFFC] = opcode;
     mem[0xFFFD] = 0x80;
@@ -179,6 +183,8 @@ void general_test::test_load_register_absolute_x(byte opcode, byte emulator::CPU
 }
 
 void general_test::test_load_register_absolute_y(byte opcode, byte emulator::CPU::*reg) {
+    cpu.Z = cpu.N = true;
+
     cpu.Y = 1;
     mem[0xFFFC] = opcode;
     mem[0xFFFD] = 0x80;
@@ -353,6 +359,8 @@ TEST_F(general_test, LDXAbsoluteYCanLoadValueIntoRegisterXWhenBoundsCrossing) {
 }
 
 TEST_F(general_test, LDAIndirectXCanLoadValueIntoRegisterA) {
+    cpu.Z = cpu.N = true;
+
     cpu.X = 0x04;
     mem[0xFFFC] = CPU::INS_LDA_INDX;
     mem[0xFFFD] = 0x02;
@@ -377,6 +385,8 @@ TEST_F(general_test, LDAIndirectXCanLoadValueIntoRegisterA) {
 
 
 TEST_F(general_test, LDAIndirectYCanLoadValueIntoRegisterA) {
+    cpu.Z = cpu.N = true;
+
     cpu.Y = 0x04;
     mem[0xFFFC] = CPU::INS_LDA_INDY;
     mem[0xFFFD] = 0x02;

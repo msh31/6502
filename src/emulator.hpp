@@ -80,6 +80,7 @@ struct emulator::CPU {
 
         INS_JSR = 0x20;
 
+    //sets the right status after load register instr | LDA, LDX, LDY
     void load_register_set_status(byte reg) {
         Z = (reg==0);
         N = (reg & 0b10000000) > 0;
