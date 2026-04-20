@@ -224,7 +224,7 @@ TEST_F(general_test, LDAAbsoluteXCanLoadValueIntoRegisterAWhenBoundsCrossing) {
 }
 
 TEST_F(general_test, LDAAbsoluteYCanLoadValueIntoRegisterA) {
-    cpu.X = 1;
+    cpu.Y = 1;
     mem[0xFFFC] = CPU::INS_LDA_ABSY;
     mem[0xFFFD] = 0x80;
     mem[0xFFFE] = 0x44; //0x4480
@@ -246,7 +246,7 @@ TEST_F(general_test, LDAAbsoluteYCanLoadValueIntoRegisterA) {
 }
 
 TEST_F(general_test, LDAAbsoluteYCanLoadValueIntoRegisterAWhenBoundsCrossing) {
-    cpu.X = 0xFF;
+    cpu.Y = 0xFF;
     mem[0xFFFC] = CPU::INS_LDA_ABSY;
     mem[0xFFFD] = 0x02;
     mem[0xFFFE] = 0x44; //0x4402
