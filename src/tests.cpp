@@ -161,7 +161,7 @@ TEST_F(general_test, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
 TEST_F(general_test, LDAAbsoluteCanLoadValueIntoRegisterA) {
     mem[0xFFFC] = CPU::INS_LDA_ABS;
     mem[0xFFFD] = 0x80;
-    mem[0xFFFE] = 0x40; //0x4480
+    mem[0xFFFE] = 0x44; //0x4480
     mem[0x4480] = 0x37;
 
     //when
