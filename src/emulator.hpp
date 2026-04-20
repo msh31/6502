@@ -80,9 +80,9 @@ struct emulator::CPU {
 
         INS_JSR = 0x20;
 
-    void lda_set_status() {
-        Z = (A==0);
-        N = (A & 0b10000000) > 0;
+    void load_register_set_status(byte reg) {
+        Z = (reg==0);
+        N = (reg & 0b10000000) > 0;
     }
 
     void reset(Memory& mem) {
