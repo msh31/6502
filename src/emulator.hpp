@@ -93,7 +93,7 @@ struct CPU {
         program_counter++;
 
         data |= (mem[program_counter] << 8);
-        // program_counter++;
+        program_counter++;
         cycles -= 2;
         return data;
     }
