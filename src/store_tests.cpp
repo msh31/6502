@@ -102,8 +102,8 @@ TEST_F(store_tests, STYZeroPageXCanStoreRegisterAIntoMemory) {
 }
 
 TEST_F(store_tests, STXZeroPageYCanStoreRegisterAIntoMemory) {
-    cpu.A = 0x42;
-    cpu.X = 0x0F;
+    cpu.X = 0x42;
+    cpu.Y = 0x0F;
     mem[0xFFFC] = CPU::INS_STX_ZPY;
     mem[0xFFFD] = 0x80;
     mem[0x008F] = 0x00;
@@ -114,7 +114,7 @@ TEST_F(store_tests, STXZeroPageYCanStoreRegisterAIntoMemory) {
     const s32 real_cycle_count = cpu.execute(expected_cycles, mem);
 
     EXPECT_EQ(real_cycle_count, expected_cycles);
-    EXPECT_EQ(mem[0x0080], 0x42);
+    EXPECT_EQ(mem[0x008F], 0x42);
     verify_unmodified_flags_from_store_register(cpu, cpu_copy);
 }
 
