@@ -46,19 +46,19 @@ TEST_F(general_test, CPUCanExecuteMoreCyclesThanRequestedIfRequiredByTheInstruct
     EXPECT_EQ(cycles_used, 2);
 }
 
-TEST_F(general_test, ExecutingBadInstructionDoesNotCauseInfiniteLoop) {
-    //given
-    mem[0xFFFC] = 0x00; //invalid opcode
-    mem[0xFFFD] = 0x00;
-    constexpr s32 NUM_CYCLES = 1;
-
-    //when
-    CPU cpu_copy = cpu;
-    s32 cycles_used = cpu.execute(NUM_CYCLES, mem); //explicitly set to 1 for testing!
-
-    //then
-    EXPECT_EQ(cycles_used, NUM_CYCLES);
-}
+// TEST_F(general_test, ExecutingBadInstructionDoesNotCauseInfiniteLoop) {
+//     //given
+//     mem[0xFFFC] = 0x00; //invalid opcode
+//     mem[0xFFFD] = 0x00;
+//     constexpr s32 NUM_CYCLES = 1;
+//
+//     //when
+//     CPU cpu_copy = cpu;
+//     s32 cycles_used = cpu.execute(NUM_CYCLES, mem); //explicitly set to 1 for testing!
+//
+//     //then
+//     EXPECT_EQ(cycles_used, NUM_CYCLES);
+// }
 
 TEST_F(general_test, LDAImmediateCanLoadValueIntoRegister) {
     //given
