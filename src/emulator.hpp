@@ -125,4 +125,56 @@ struct emulator::CPU {
    
     //returns the number of cycles used
     u32 execute(s32 cycles, Memory& mem);
+
+    //addressing mode zero page
+    word get_zero_page_address(s32& cycles, Memory& mem) {
+       return fetch_byte(cycles, mem);
+    } 
+
+    //addressing mode with zero page X offset
+    word get_zero_page_x_address(s32& cycles, Memory& mem) {
+        byte zero_page_addr = fetch_byte(cycles, mem);
+        zero_page_addr += X;
+        cycles--;
+        return zero_page_addr;
+    }
+
+    //addressing mode with zero page Y offset
+    word get_zero_page_y_address(s32& cycles, Memory& mem) {
+        byte zero_page_addr = fetch_byte(cycles, mem);
+        zero_page_addr += Y;
+        cycles--;
+        return zero_page_addr;
+    }
+
+    //addressing mode absolute
+    word get_absolute_address(s32& cycles, Memory& mem) {
+        return fetch_word(cycles, mem);
+    }
+
+    //addressing mode with absolute X offset
+    word get_absolute_x_address(s32& cycles, Memory& mem) {
+        word abs_addr = fetch_word(cycles, mem);
+        word abs_addr_x = abs_addr + X;
+        // cycles--;
+        // A = read_byte(abs_addr_x, cycles, mem);
+
+        //crosses page boundary
+        if(abs_addr_x - abs_addr >= 0XFF) cycles--;
+        // load_register_set_status(A);
+        return abs_addr_x;
+    }
+
+    //addressing mode with absolute X offset
+    word get_absolute_y_address(s32& cycles, Memory& mem) {
+        word abs_addr = fetch_word(cycles, mem);
+        word abs_addr_y = abs_addr + Y;
+        // cycles--;
+        // A = read_byte(abs_addr_x, cycles, mem);
+
+        //crosses page boundary
+        if(abs_addr_y - abs_addr >= 0XFF) cycles--;
+        // load_register_set_status(A);
+        return abs_addr_y;
+    }
 };

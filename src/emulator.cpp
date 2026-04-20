@@ -8,45 +8,34 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
         byte instruction = fetch_byte(cycles, mem);
 
         switch(instruction) {
+//LDA
             case INS_LDA_IM: {
                                  A = fetch_byte(cycles, mem);
                                  load_register_set_status(A);
                              } break;
             case INS_LDA_ZP: {
-                                 byte zero_page_addr = fetch_byte(cycles, mem);
-                                 A = read_byte(zero_page_addr, cycles, mem);
+                                 word addr = get_zero_page_address(cycles, mem);
+                                 A = read_byte(addr, cycles, mem);
                                  load_register_set_status(A);
                              } break;
             case INS_LDA_ZPX: {
-                                  byte zero_page_addr = fetch_byte(cycles, mem);
-                                  zero_page_addr += X;
-                                  cycles--;
-                                  A = read_byte(zero_page_addr, cycles, mem);
+                                  word addr = get_zero_page_x_address(cycles, mem);
+                                  A = read_byte(addr, cycles, mem);
                                   load_register_set_status(A);
                               } break;
             case INS_LDA_ABS: {
-                                  word abs_addr = fetch_word(cycles, mem);
+                                  word abs_addr = get_absolute_address(cycles, mem);
                                   A = read_byte(abs_addr, cycles, mem);
                                   load_register_set_status(A);
                               } break;
             case INS_LDA_ABSX: {
-                                   word abs_addr = fetch_word(cycles, mem);
-                                   word abs_addr_x = abs_addr + X;
-                                   // cycles--;
-                                   A = read_byte(abs_addr_x, cycles, mem);
-
-                                   //crosses page boundary
-                                   if(abs_addr_x - abs_addr >= 0XFF) cycles--;
+                                   word addr = get_absolute_x_address(cycles, mem);
+                                   A = read_byte(addr, cycles, mem);
                                    load_register_set_status(A);
                                } break;
             case INS_LDA_ABSY: {
-                                   word abs_addr = fetch_word(cycles, mem);
-                                   word abs_addr_y = abs_addr + Y;
-                                   // cycles--;
-                                   A = read_byte(abs_addr_y, cycles, mem);
-
-                                   //crosses page boundary
-                                   if(abs_addr_y - abs_addr >= 0XFF) cycles--;
+                                   word addr = get_absolute_y_address(cycles, mem);
+                                   A = read_byte(addr, cycles, mem);
                                    load_register_set_status(A);
                                } break;
             case INS_LDA_INDX: {
@@ -66,15 +55,57 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                                    if(effective_addr_y - effective_addr >= 0XFF) cycles--;
                                    load_register_set_status(A);
                                } break;
+//LDX
             case INS_LDX_IM: {
                                  X = fetch_byte(cycles, mem);
                                  load_register_set_status(X);
                              } break;
+            case INS_LDX_ZP: {
+                                 word zero_page_addr = get_zero_page_address(cycles, mem);
+                                 X = read_byte(zero_page_addr, cycles, mem);
+                                 load_register_set_status(X);
+                             } break;
+            case INS_LDX_ZPY: {
+                                 word addr = get_zero_page_y_address(cycles, mem);
+                                 X = read_byte(addr, cycles, mem);
+                                 load_register_set_status(X);
+                             } break;
+            case INS_LDX_ABS: {
+                                 word addr = get_absolute_address(cycles, mem);
+                                 X = read_byte(addr, cycles, mem);
+                                 load_register_set_status(X);
+                             } break;
+            case INS_LDX_ABSY: {
+                                   word addr = get_absolute_y_address(cycles, mem);
+                                   X = read_byte(addr, cycles, mem);
+                                   load_register_set_status(X);
+                               } break;
+//LDY
             case INS_LDY_IM: {
                                  Y = fetch_byte(cycles, mem);
                                  load_register_set_status(Y);
                              } break;
-
+            case INS_LDY_ZP: {
+                                 word addr = get_zero_page_address(cycles, mem);
+                                 Y = read_byte(addr, cycles, mem);
+                                 load_register_set_status(Y);
+                             } break;
+            case INS_LDY_ZPX: {
+                                 word addr = get_zero_page_x_address(cycles, mem);
+                                 Y = read_byte(addr, cycles, mem);
+                                 load_register_set_status(Y);
+                             } break;
+            case INS_LDY_ABS: {
+                                 word addr = get_absolute_address(cycles, mem);
+                                 Y = read_byte(addr, cycles, mem);
+                                 load_register_set_status(Y);
+                             } break;
+            case INS_LDY_ABSX: {
+                                   word addr = get_absolute_x_address(cycles, mem);
+                                   Y = read_byte(addr, cycles, mem);
+                                   load_register_set_status(Y);
+                               } break;
+//JSR
             case INS_JSR: {
                               word sub_addr = fetch_word(cycles, mem);
                               mem.write_word(program_counter -1, 0x0100 | stack_pointer, cycles);
