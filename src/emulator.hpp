@@ -105,7 +105,7 @@ struct emulator::CPU {
         return low | (high << 8);
     }
 
-    byte fetch_byte(s32& cycles, Memory& mem) {
+    byte fetch_byte(s32& cycles, const Memory& mem) {
         byte data = mem[program_counter];
         program_counter++;
         cycles--;
@@ -113,7 +113,7 @@ struct emulator::CPU {
         return data;
     }
     //6502 is little endian
-    word fetch_word(s32& cycles, Memory& mem) {
+    word fetch_word(s32& cycles, const Memory& mem) {
         word data = mem[program_counter];
         program_counter++;
 
@@ -127,12 +127,12 @@ struct emulator::CPU {
     u32 execute(s32 cycles, Memory& mem);
 
     //addressing mode zero page
-    word get_zero_page_address(s32& cycles, Memory& mem) {
+    word get_zero_page_address(s32& cycles, const Memory& mem) {
        return fetch_byte(cycles, mem);
     } 
 
     //addressing mode with zero page X offset
-    word get_zero_page_x_address(s32& cycles, Memory& mem) {
+    word get_zero_page_x_address(s32& cycles, const Memory& mem) {
         byte zero_page_addr = fetch_byte(cycles, mem);
         zero_page_addr += X;
         cycles--;
@@ -140,7 +140,7 @@ struct emulator::CPU {
     }
 
     //addressing mode with zero page Y offset
-    word get_zero_page_y_address(s32& cycles, Memory& mem) {
+    word get_zero_page_y_address(s32& cycles, const Memory& mem) {
         byte zero_page_addr = fetch_byte(cycles, mem);
         zero_page_addr += Y;
         cycles--;
@@ -148,12 +148,12 @@ struct emulator::CPU {
     }
 
     //addressing mode absolute
-    word get_absolute_address(s32& cycles, Memory& mem) {
+    word get_absolute_address(s32& cycles, const Memory& mem) {
         return fetch_word(cycles, mem);
     }
 
     //addressing mode with absolute X offset
-    word get_absolute_x_address(s32& cycles, Memory& mem) {
+    word get_absolute_x_address(s32& cycles, const Memory& mem) {
         word abs_addr = fetch_word(cycles, mem);
         word abs_addr_x = abs_addr + X;
         // cycles--;
@@ -166,7 +166,7 @@ struct emulator::CPU {
     }
 
     //addressing mode with absolute X offset
-    word get_absolute_y_address(s32& cycles, Memory& mem) {
+    word get_absolute_y_address(s32& cycles, const Memory& mem) {
         word abs_addr = fetch_word(cycles, mem);
         word abs_addr_y = abs_addr + Y;
         // cycles--;
