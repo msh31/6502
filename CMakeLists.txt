@@ -54,6 +54,7 @@ FetchContent_MakeAvailable(googletest)
 # Target: 6502_emulator
 set(6502_emulator_SOURCES
 	cmake.toml
+	"src/emulator.cpp"
 	"src/emulator.hpp"
 	"src/main.cpp"
 	"src/tests.cpp"

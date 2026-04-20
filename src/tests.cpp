@@ -1,6 +1,8 @@
 #include "emulator.hpp"
 #include <gtest/gtest.h>
 
+using namespace emulator;
+
 class general_test : public testing::Test {
 public:
     Memory mem;
