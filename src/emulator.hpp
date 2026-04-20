@@ -123,12 +123,25 @@ struct CPU {
                     A = read_byte(zero_page_addr, cycles, mem);
                     lda_set_status();
                 } break;
+                case INS_LDA_ABS: {
+
+                } break;
+                // case INS_LDA_ABS: {
+                //
+                // } break;
+                // case INS_LDA_ABS: {
+                //
+                // } break;
+                // case INS_LDA_ABS: {
+                //
+                // } break;
                 case INS_JSR: {
                     word sub_addr = fetch_word(cycles, mem);
                     mem.write_word(program_counter -1, 0x0100 | stack_pointer, cycles);
 
                     program_counter = sub_addr;
-                    stack_pointer--;
+                    stack_pointer -= 2;
+                    cycles -= 1;
               } break;
                 default:
                   std::println("Instruction not handled: {}!", instruction);
