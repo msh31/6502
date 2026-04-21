@@ -149,7 +149,7 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
 //JSR
             case INS_JSR: {
                               word sub_addr = fetch_word(cycles, mem);
-                              mem.write_word(program_counter -1, 0x0100 | stack_pointer, cycles);
+                              write_word(program_counter -1, 0x0100 | stack_pointer, cycles, mem);
 
                               program_counter = sub_addr;
                               stack_pointer -= 2;

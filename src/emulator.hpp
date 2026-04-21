@@ -31,12 +31,6 @@ struct emulator::Memory {
     byte& operator[](u32 address) {
         return data[address];
     }
-
-    void write_word(word value, u32 address, s32& cycles) {
-        data[address]       = value & 0xFF;
-        data[address + 1]   = (value >> 8);
-        cycles -= 2;
-    }
 };
 
 struct emulator::CPU {
@@ -130,6 +124,11 @@ struct emulator::CPU {
         byte low = read_byte(address, cycles, mem);
         byte high = read_byte(address + 1, cycles, mem);
         return low | (high << 8);
+    }
+    void write_word(word value, word address, s32& cycles, Memory& mem) {
+        mem[address]       = value & 0xFF;
+        mem[address + 1]   = (value >> 8);
+        cycles -= 2;
     }
 
     byte fetch_byte(s32& cycles, const Memory& mem) {
