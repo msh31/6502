@@ -151,6 +151,25 @@ struct emulator::CPU {
         cycles -= 2;
         return data;
     }
+
+    //returns the SP as a full 16-bit addr (in 1st page)
+    word stack_pointer_to_address() const {
+        return 0x100 | stack_pointer;
+    }
+
+    //push program counter - 1 onto the stack
+    void push_program_counter_to_stack(s32& cycles, Memory& mem) {
+        write_word(program_counter -1, stack_pointer_to_address() -1, cycles, mem);
+        stack_pointer -= 2;
+    }
+
+    //pop from porgram counter
+    word pop_word_from_stack(s32& cycles, Memory& mem) {
+        word val = read_word(stack_pointer_to_address() + 1, cycles, mem);
+        stack_pointer += 2;
+        cycles--;
+        return val;
+    }
    
     //returns the number of cycles used
     u32 execute(s32 cycles, Memory& mem);

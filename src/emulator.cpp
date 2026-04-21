@@ -143,11 +143,15 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
 //JSR
             case INS_JSR: {
                               word sub_addr = fetch_word(cycles, mem);
-                              write_word(program_counter -1, 0x0100 | stack_pointer, cycles, mem);
-
+                              push_program_counter_to_stack(cycles, mem);
                               program_counter = sub_addr;
-                              stack_pointer -= 2;
-                              cycles -= 1;
+                              cycles--;
+                          } break;
+//RTS
+            case INS_RTS: {  
+                              word return_addr = pop_word_from_stack(cycles, mem);
+                              program_counter = return_addr + 1;
+                              cycles -= 2;
                           } break;
             default:
                           std::println("Instruction not handled: {}!", instruction);

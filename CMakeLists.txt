@@ -56,6 +56,7 @@ set(6502_emulator_SOURCES
 	cmake.toml
 	"src/emulator.cpp"
 	"src/emulator.hpp"
+	"src/jump_call_tests.cpp"
 	"src/load_tests.cpp"
 	"src/main.cpp"
 	"src/store_tests.cpp"
