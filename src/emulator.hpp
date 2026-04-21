@@ -114,12 +114,19 @@ struct emulator::CPU {
         mem.init();
     }
 
-    byte read_byte(word address, s32& cycles, Memory& mem) {
+    byte read_byte(word address, s32& cycles, const Memory& mem) {
         byte data = mem[address];
         cycles--;
         return data;
     }
-    word read_word(word address, s32& cycles, Memory& mem) {
+    void write_byte(byte value, s32& cycles, word addr, Memory& mem) {
+        mem[addr] = value;
+        cycles--;
+
+        // if(addr > 0xFF) cycles--;
+    }
+
+    word read_word(word address, s32& cycles, const Memory& mem) {
         byte low = read_byte(address, cycles, mem);
         byte high = read_byte(address + 1, cycles, mem);
         return low | (high << 8);
@@ -196,5 +203,23 @@ struct emulator::CPU {
         if(abs_addr_y - abs_addr >= 0XFF) cycles--;
         // load_register_set_status(A);
         return abs_addr_y;
+    }
+
+    //addressing mode with indirect X / indeed indirected
+    word get_indirect_x_address(s32& cycles, const Memory& mem) {
+        byte zp_addr = fetch_byte(cycles, mem);
+        zp_addr += X;
+        cycles--;
+        return read_word(zp_addr, cycles, mem);
+    }
+
+    //addressing mode with indirect Y / indirect index
+    word get_indirect_y_address(s32& cycles, const Memory& mem) {
+        byte zp_addr = fetch_byte(cycles, mem);
+        word effective_addr = read_word(zp_addr, cycles, mem);
+        word effective_addr_y = effective_addr + Y;
+
+        if(effective_addr_y  - effective_addr >= 0xff) cycles--;
+        return effective_addr_y;
     }
 };

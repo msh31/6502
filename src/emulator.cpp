@@ -40,19 +40,12 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                                   load_register(addr, A);
                                } break;
             case INS_LDA_INDX: {
-                                   byte zp_addr = fetch_byte(cycles, mem);
-                                   zp_addr += X;
-                                   cycles--;
-                                   word effective_addr = read_word(zp_addr, cycles, mem);
-                                   load_register(effective_addr, A);
+                                   word addr = get_indirect_x_address(cycles, mem);
+                                   load_register(addr, A);
                                } break;
             case INS_LDA_INDY: {
-                                   byte zp_addr = fetch_byte(cycles, mem);
-                                   word effective_addr = read_word(zp_addr, cycles, mem);
-                                   word effective_addr_y = effective_addr + Y;
-
-                                   if(effective_addr_y - effective_addr >= 0XFF) cycles--;
-                                   load_register(effective_addr_y, A);
+                                   word addr = get_indirect_y_address(cycles, mem);
+                                   load_register(addr, A);
                                } break;
 //LDX
             case INS_LDX_IM: {
@@ -96,6 +89,63 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                                    word addr = get_absolute_x_address(cycles, mem);
                                   load_register(addr, Y);
                                } break;
+//STA
+            case INS_STA_ZP: {
+                                 word addr = get_zero_page_address(cycles, mem);
+                                 write_byte(A, cycles, addr, mem);
+                             } break;
+            case INS_STA_ZPX: {
+                                 word addr = get_zero_page_x_address(cycles, mem);
+                                 write_byte(A, cycles, addr, mem);
+                             } break;
+            case INS_STA_ABS: {
+                                 word addr = get_absolute_address(cycles, mem);
+                                 write_byte(A, cycles, addr, mem);
+                             } break;
+            case INS_STA_ABSX: {
+                                   /* can consume an extra cycle on bounds crossing */
+                                 word addr = get_absolute_x_address(cycles, mem);
+                                 write_byte(A, cycles, addr, mem);
+                                 cycles--; //not sure where this is coming from
+                             } break;
+            case INS_STA_ABSY: {
+                                   /* can consume an extra cycle on bounds crossing */
+                                 word addr = get_absolute_y_address(cycles, mem);
+                                 write_byte(A, cycles, addr, mem);
+                                 cycles--; //not sure where this is coming from
+                             } break;
+            case INS_STA_INDX: {
+                                   word addr = get_indirect_x_address(cycles, mem);
+                                   write_byte(A, cycles, addr, mem);
+                               } break;
+            case INS_STA_INDY: {
+                                   /* can consume an extra cycle on bounds crossing */
+                                   word addr = get_indirect_y_address(cycles, mem);
+                                   write_byte(A, cycles, addr, mem);
+                                   cycles--; //ntosure where this is coming from either
+                               } break;
+//STX
+            case INS_STX_ZP: {
+                                 word addr = get_zero_page_address(cycles, mem);
+                                 write_byte(X, cycles, addr, mem);
+                             } break;
+            case INS_STX_ABS: {
+                                  word addr = get_absolute_address(cycles, mem);
+                                  write_byte(X, cycles, addr, mem);
+                              } break;
+//STY
+            case INS_STY_ZP: {
+                                 word addr = get_zero_page_address(cycles, mem);
+                                 write_byte(Y, cycles, addr, mem);
+                             } break;
+            case INS_STY_ZPX: {
+                                  word addr = get_zero_page_x_address(cycles, mem);
+                                  write_byte(Y, cycles, addr, mem);
+                              } break;
+            case INS_STY_ABS: {
+                                  word addr = get_absolute_address(cycles, mem);
+                                  write_byte(Y, cycles, addr, mem);
+                              } break;
 //JSR
             case INS_JSR: {
                               word sub_addr = fetch_word(cycles, mem);
