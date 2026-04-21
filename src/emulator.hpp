@@ -39,6 +39,7 @@ struct status_flags {
     byte I : 1;
     byte D : 1;
     byte B : 1;
+    byte unused : 1;
     byte V : 1;
     byte N : 1;
 };
