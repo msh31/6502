@@ -35,4 +35,6 @@ TEST_F(jump_call_tests, CanJumpToSubroutineAndBack) {
 
     EXPECT_EQ(real_cycles, expected_cycles);
     EXPECT_EQ(cpu.A, 0x42);
+    EXPECT_EQ(cpu.stack_pointer, cpu_copy.stack_pointer);
 }
+
