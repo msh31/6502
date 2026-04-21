@@ -107,7 +107,23 @@ struct emulator::CPU {
 
         //JMP
         INS_JMP_ABS = 0x4C,
-        INS_JMP_IND = 0x6C;
+        INS_JMP_IND = 0x6C,
+
+        //TSX
+        INS_TSX = 0xBA,
+        INS_TXS = 0x9A,
+
+        //PHA
+        INS_PHA = 0x48,
+
+        //PHP
+        INS_PHP = 0x08,
+
+        //PLA
+        INS_PLA = 0x68,
+
+        //PLP
+        INS_PLP = 0x28;
 
     //sets the right status after load register instr | LDA, LDX, LDY
     void load_register_set_status(byte reg) {
@@ -169,18 +185,34 @@ struct emulator::CPU {
         return 0x100 | stack_pointer;
     }
 
+    void push_byte_onto_stack(byte value, s32& cycles, Memory& mem) {
+        const word sp_word = stack_pointer_to_address();
+        mem[sp_word] = value;
+        cycles--;
+        stack_pointer--;
+        cycles--;
+    }
+
     //push program counter - 1 onto the stack
     void push_program_counter_to_stack(s32& cycles, Memory& mem) {
         write_word(program_counter -1, stack_pointer_to_address() -1, cycles, mem);
         stack_pointer -= 2;
     }
 
-    //pop from porgram counter
+    //pop a 16bit value rom the stack
     word pop_word_from_stack(s32& cycles, Memory& mem) {
         word val = read_word(stack_pointer_to_address() + 1, cycles, mem);
         stack_pointer += 2;
         cycles--;
         return val;
+    }
+
+    byte pop_byte_from_stack(s32& cycles, Memory& mem) {
+        stack_pointer++;
+        const word sp_word = stack_pointer_to_address();
+        byte value = mem[sp_word];
+        cycles -= 3;
+        return value;
     }
    
     //returns the number of cycles used

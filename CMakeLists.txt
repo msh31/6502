@@ -59,6 +59,7 @@ set(6502_emulator_SOURCES
 	"src/jump_call_tests.cpp"
 	"src/load_tests.cpp"
 	"src/main.cpp"
+	"src/stack_test.cpp"
 	"src/store_tests.cpp"
 )
 

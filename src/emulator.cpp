@@ -162,7 +162,33 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                               word addr = get_absolute_address(cycles, mem);
                               addr = read_word(addr, cycles, mem);
                               program_counter = addr;
-
+                          } break;
+//TSX
+            case INS_TSX: {  
+                              X = stack_pointer;
+                              cycles--;
+                              load_register_set_status(X);
+                          } break;
+            case INS_TXS: {  
+                              stack_pointer = X;
+                              cycles--;
+                          } break;
+//PHA
+            case INS_PHA: { 
+                              push_byte_onto_stack(A, cycles, mem);
+                          } break;
+//PHP
+            case INS_PHP: { 
+                              push_byte_onto_stack(ps, cycles, mem);
+                          } break;
+//PLA
+            case INS_PLA: { 
+                              A = pop_byte_from_stack(cycles, mem);
+                              load_register_set_status(A);
+                          } break;
+//PLP
+            case INS_PLP: { 
+                              ps = pop_byte_from_stack(cycles, mem);
                           } break;
             default:
                           std::println("Instruction not handled: {}!", instruction);
