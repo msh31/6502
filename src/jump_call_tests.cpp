@@ -38,3 +38,18 @@ TEST_F(jump_call_tests, CanJumpToSubroutineAndBack) {
     EXPECT_EQ(cpu.stack_pointer, cpu_copy.stack_pointer);
 }
 
+TEST_F(jump_call_tests, JSRDoesNotAffectProcessorStatus) {
+    cpu.reset(0xFF00, mem);
+
+    mem[0xFF00] = CPU::INS_JSR;
+    mem[0xFF01] = 0x00;
+    mem[0xFF02] = 0x80;
+
+    constexpr s32 expected_cycles = 6;
+    CPU cpu_copy = cpu;
+
+    const s32 real_cycles = cpu.execute(expected_cycles, mem);
+
+    EXPECT_EQ(real_cycles, expected_cycles);
+    EXPECT_EQ(cpu.ps, cpu_copy.ps); //processor status
+}

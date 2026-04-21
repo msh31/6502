@@ -29,11 +29,11 @@ public:
 };
 
 static void verify_unmodified_flags_from_load_register(const CPU& cpu, const CPU& cpu_copy) {
-    EXPECT_EQ(cpu.C, cpu_copy.C);
-    EXPECT_EQ(cpu.I, cpu_copy.I);
-    EXPECT_EQ(cpu.D, cpu_copy.D);
-    EXPECT_EQ(cpu.B, cpu_copy.B);
-    EXPECT_EQ(cpu.V, cpu_copy.V);
+    EXPECT_EQ(cpu.flag.C, cpu_copy.flag.C);
+    EXPECT_EQ(cpu.flag.I, cpu_copy.flag.I);
+    EXPECT_EQ(cpu.flag.D, cpu_copy.flag.D);
+    EXPECT_EQ(cpu.flag.B, cpu_copy.flag.B);
+    EXPECT_EQ(cpu.flag.V, cpu_copy.flag.V);
 }
 
 TEST_F(load_tests, DoNothingWhenExecutingZeroCycles) {
@@ -68,8 +68,8 @@ void load_tests::test_load_register_immediate(byte opcode, byte CPU::*reg) {
     EXPECT_EQ(cpu.*reg, 0x84);
     EXPECT_EQ(cycles_used, 2);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_TRUE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_TRUE(cpu.flag.N);
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
@@ -87,8 +87,8 @@ void load_tests::test_load_register_zero_page(byte opcode, byte emulator::CPU::*
     EXPECT_EQ(cpu.*reg, 0x37);
     EXPECT_EQ(cycles_used, 3);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
@@ -108,8 +108,8 @@ void load_tests::test_load_register_zero_page_x(byte opcode, byte emulator::CPU:
     EXPECT_EQ(cpu.*reg, 0x37);
     EXPECT_EQ(cycles_used, 4);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
@@ -129,14 +129,14 @@ void load_tests::test_load_register_zero_page_y(byte opcode, byte emulator::CPU:
     EXPECT_EQ(cpu.*reg, 0x37);
     EXPECT_EQ(cycles_used, 4);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
 void load_tests::test_load_register_absolute(byte opcode, byte emulator::CPU::*reg) {
-    cpu.Z = cpu.N = true;
+    cpu.flag.Z = cpu.flag.N = true;
 
     mem[0xFFFC] = opcode;
     mem[0xFFFD] = 0x80;
@@ -152,14 +152,14 @@ void load_tests::test_load_register_absolute(byte opcode, byte emulator::CPU::*r
     EXPECT_EQ(cpu.*reg, 0x37);
     EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
 void load_tests::test_load_register_absolute_x(byte opcode, byte emulator::CPU::*reg) {
-    cpu.Z = cpu.N = true;
+    cpu.flag.Z = cpu.flag.N = true;
 
     cpu.X = 1;
     mem[0xFFFC] = opcode;
@@ -176,14 +176,14 @@ void load_tests::test_load_register_absolute_x(byte opcode, byte emulator::CPU::
     EXPECT_EQ(cpu.*reg, 0x37);
     EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
 void load_tests::test_load_register_absolute_y(byte opcode, byte emulator::CPU::*reg) {
-    cpu.Z = cpu.N = true;
+    cpu.flag.Z = cpu.flag.N = true;
 
     cpu.Y = 1;
     mem[0xFFFC] = opcode;
@@ -200,8 +200,8 @@ void load_tests::test_load_register_absolute_y(byte opcode, byte emulator::CPU::
     EXPECT_EQ(cpu.*reg, 0x37);
     EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
@@ -222,8 +222,8 @@ void load_tests::test_load_register_absolute_x_crossing(byte opcode, byte emulat
     EXPECT_EQ(cpu.*reg, 0x37);
     EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
@@ -244,8 +244,8 @@ void load_tests::test_load_register_absolute_y_crossing(byte opcode, byte emulat
     EXPECT_EQ(cpu.*reg, 0x37);
     EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
@@ -273,8 +273,8 @@ TEST_F(load_tests, LDAImmediateCanAffectZeroFlag) {
     s32 cycles_used = cpu.execute(2, mem);
 
     //then
-    EXPECT_TRUE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_TRUE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
@@ -314,8 +314,8 @@ TEST_F(load_tests, LDAZeroPageXCanLoadValueIntoRegisterAWhenItWraps) {
     EXPECT_EQ(cpu.A, 0x37);
     EXPECT_EQ(cycles_used, 4);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
@@ -359,7 +359,7 @@ TEST_F(load_tests, LDXAbsoluteYCanLoadValueIntoRegisterXWhenBoundsCrossing) {
 }
 
 TEST_F(load_tests, LDAIndirectXCanLoadValueIntoRegisterA) {
-    cpu.Z = cpu.N = true;
+    cpu.flag.Z = cpu.flag.N = true;
 
     cpu.X = 0x04;
     mem[0xFFFC] = CPU::INS_LDA_INDX;
@@ -377,15 +377,15 @@ TEST_F(load_tests, LDAIndirectXCanLoadValueIntoRegisterA) {
     EXPECT_EQ(cpu.A, 0x37);
     EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
 
 
 TEST_F(load_tests, LDAIndirectYCanLoadValueIntoRegisterA) {
-    cpu.Z = cpu.N = true;
+    cpu.flag.Z = cpu.flag.N = true;
 
     cpu.Y = 0x04;
     mem[0xFFFC] = CPU::INS_LDA_INDY;
@@ -403,8 +403,8 @@ TEST_F(load_tests, LDAIndirectYCanLoadValueIntoRegisterA) {
     EXPECT_EQ(cpu.A, 0x37);
     EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }
@@ -426,8 +426,8 @@ TEST_F(load_tests, LDAIndirectYCanLoadValueIntoRegisterAWhenBoundsCrossing) {
     EXPECT_EQ(cpu.A, 0x37);
     EXPECT_EQ(cycles_used, EXPECTED_CYCLES);
 
-    EXPECT_FALSE(cpu.Z);
-    EXPECT_FALSE(cpu.N);
+    EXPECT_FALSE(cpu.flag.Z);
+    EXPECT_FALSE(cpu.flag.N);
 
     verify_unmodified_flags_from_load_register(cpu, cpu_copy);
 }

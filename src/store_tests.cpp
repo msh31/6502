@@ -23,13 +23,13 @@ public:
 };
 
 static void verify_unmodified_flags_from_store_register(const CPU& cpu, const CPU& cpu_copy) {
-    EXPECT_EQ(cpu.C, cpu_copy.C);
-    EXPECT_EQ(cpu.I, cpu_copy.I);
-    EXPECT_EQ(cpu.D, cpu_copy.D);
-    EXPECT_EQ(cpu.B, cpu_copy.B);
-    EXPECT_EQ(cpu.V, cpu_copy.V);
-    EXPECT_EQ(cpu.Z, cpu_copy.Z);
-    EXPECT_EQ(cpu.N, cpu_copy.N);
+    EXPECT_EQ(cpu.flag.C, cpu_copy.flag.C);
+    EXPECT_EQ(cpu.flag.I, cpu_copy.flag.I);
+    EXPECT_EQ(cpu.flag.D, cpu_copy.flag.D);
+    EXPECT_EQ(cpu.flag.B, cpu_copy.flag.B);
+    EXPECT_EQ(cpu.flag.V, cpu_copy.flag.V);
+    EXPECT_EQ(cpu.flag.Z, cpu_copy.flag.Z);
+    EXPECT_EQ(cpu.flag.N, cpu_copy.flag.N);
 }
 
 void store_tests::store_register_zero_page(byte opcode, byte CPU::*reg) {

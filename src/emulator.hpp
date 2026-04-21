@@ -33,12 +33,7 @@ struct emulator::Memory {
     }
 };
 
-struct emulator::CPU {
-    word program_counter;
-    byte stack_pointer;
-
-    byte A, X, Y;                   //registers
-
+struct status_flags {
     byte C : 1;                     //bit fields (used for the processor flags)
     byte Z : 1;
     byte I : 1;
@@ -46,6 +41,18 @@ struct emulator::CPU {
     byte B : 1;
     byte V : 1;
     byte N : 1;
+};
+
+struct emulator::CPU {
+    word program_counter;
+    byte stack_pointer;
+
+    byte A, X, Y;                   //registers
+    
+    union { //processor status
+        byte ps;
+        status_flags flag;
+    };
 
     static constexpr byte
         //LDA
@@ -99,14 +106,14 @@ struct emulator::CPU {
 
     //sets the right status after load register instr | LDA, LDX, LDY
     void load_register_set_status(byte reg) {
-        Z = (reg==0);
-        N = (reg & 0b10000000) > 0;
+        flag.Z = (reg==0);
+        flag.N = (reg & 0b10000000) > 0;
     }
 
     void reset(word reset_vector, Memory& mem) {
         program_counter = reset_vector;
         stack_pointer = 0xFF;
-        C = Z = I = D = B = V = N = 0;
+        flag.C = flag.Z = flag.I = flag.D = flag.B = flag.V = flag.N = 0;
         A = X = Y = 0;
         mem.init();
     }
