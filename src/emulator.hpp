@@ -103,7 +103,11 @@ struct emulator::CPU {
         INS_JSR = 0x20,
 
         //RTS
-        INS_RTS = 0x60;
+        INS_RTS = 0x60,
+
+        //JMP
+        INS_JMP_ABS = 0x4C,
+        INS_JMP_IND = 0x6C;
 
     //sets the right status after load register instr | LDA, LDX, LDY
     void load_register_set_status(byte reg) {

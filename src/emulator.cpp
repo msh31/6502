@@ -153,6 +153,17 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                               program_counter = return_addr + 1;
                               cycles -= 2;
                           } break;
+//JMP
+            case INS_JMP_ABS: {  
+                              word addr = get_absolute_address(cycles, mem);
+                              program_counter = addr;
+                          } break;
+            case INS_JMP_IND: {  
+                              word addr = get_absolute_address(cycles, mem);
+                              addr = read_word(addr, cycles, mem);
+                              program_counter = addr;
+
+                          } break;
             default:
                           std::println("Instruction not handled: {}!", instruction);
                           throw -1;
