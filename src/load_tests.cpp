@@ -10,7 +10,7 @@ public:
 
     //tip: do not use these in all lowercase.
     virtual void SetUp() override {
-        cpu.reset(mem);
+        cpu.reset(0xFFFC, mem);
     }
 
     virtual void TearDown() override {

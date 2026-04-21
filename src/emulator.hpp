@@ -92,7 +92,10 @@ struct emulator::CPU {
         INS_STY_ABS = 0x8C,
 
         //JSR
-        INS_JSR = 0x20;
+        INS_JSR = 0x20,
+
+        //RTS
+        INS_RTS = 0x60;
 
     //sets the right status after load register instr | LDA, LDX, LDY
     void load_register_set_status(byte reg) {
@@ -100,8 +103,8 @@ struct emulator::CPU {
         N = (reg & 0b10000000) > 0;
     }
 
-    void reset(Memory& mem) {
-        program_counter = 0xFFFC;
+    void reset(word reset_vector, Memory& mem) {
+        program_counter = reset_vector;
         stack_pointer = 0xFF;
         C = Z = I = D = B = V = N = 0;
         A = X = Y = 0;
