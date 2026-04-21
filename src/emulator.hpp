@@ -179,27 +179,27 @@ struct emulator::CPU {
     }
 
     //addressing mode with absolute X offset
-    word get_absolute_x_address(s32& cycles, const Memory& mem) {
+    word get_absolute_x_address(s32& cycles, const Memory& mem, bool consume_extra = false) {
         word abs_addr = fetch_word(cycles, mem);
         word abs_addr_x = abs_addr + X;
         // cycles--;
         // A = read_byte(abs_addr_x, cycles, mem);
 
         //crosses page boundary
-        if(abs_addr_x - abs_addr >= 0XFF) cycles--;
+        if(abs_addr_x - abs_addr >= 0xff || consume_extra) cycles--;
         // load_register_set_status(A);
         return abs_addr_x;
     }
 
     //addressing mode with absolute X offset
-    word get_absolute_y_address(s32& cycles, const Memory& mem) {
+    word get_absolute_y_address(s32& cycles, const Memory& mem, bool consume_extra = false) {
         word abs_addr = fetch_word(cycles, mem);
         word abs_addr_y = abs_addr + Y;
         // cycles--;
         // A = read_byte(abs_addr_x, cycles, mem);
 
         //crosses page boundary
-        if(abs_addr_y - abs_addr >= 0XFF) cycles--;
+        if(abs_addr_y - abs_addr >= 0xff || consume_extra) cycles--;
         // load_register_set_status(A);
         return abs_addr_y;
     }
@@ -213,12 +213,12 @@ struct emulator::CPU {
     }
 
     //addressing mode with indirect Y / indirect index
-    word get_indirect_y_address(s32& cycles, const Memory& mem) {
+    word get_indirect_y_address(s32& cycles, const Memory& mem, bool consume_extra = false) {
         byte zp_addr = fetch_byte(cycles, mem);
         word effective_addr = read_word(zp_addr, cycles, mem);
         word effective_addr_y = effective_addr + Y;
 
-        if(effective_addr_y  - effective_addr >= 0xff) cycles--;
+        if(effective_addr_y  - effective_addr >= 0xff || consume_extra) cycles--;
         return effective_addr_y;
     }
 };

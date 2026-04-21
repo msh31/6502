@@ -103,26 +103,20 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                                  write_byte(A, cycles, addr, mem);
                              } break;
             case INS_STA_ABSX: {
-                                   /* can consume an extra cycle on bounds crossing */
-                                 word addr = get_absolute_x_address(cycles, mem);
+                                 word addr = get_absolute_x_address(cycles, mem, true);
                                  write_byte(A, cycles, addr, mem);
-                                 cycles--; //not sure where this is coming from
                              } break;
             case INS_STA_ABSY: {
-                                   /* can consume an extra cycle on bounds crossing */
-                                 word addr = get_absolute_y_address(cycles, mem);
+                                 word addr = get_absolute_y_address(cycles, mem, true);
                                  write_byte(A, cycles, addr, mem);
-                                 cycles--; //not sure where this is coming from
                              } break;
             case INS_STA_INDX: {
                                    word addr = get_indirect_x_address(cycles, mem);
                                    write_byte(A, cycles, addr, mem);
                                } break;
             case INS_STA_INDY: {
-                                   /* can consume an extra cycle on bounds crossing */
-                                   word addr = get_indirect_y_address(cycles, mem);
+                                   word addr = get_indirect_y_address(cycles, mem, true);
                                    write_byte(A, cycles, addr, mem);
-                                   cycles--; //ntosure where this is coming from either
                                } break;
 //STX
             case INS_STX_ZP: {
