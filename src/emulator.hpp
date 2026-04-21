@@ -123,7 +123,19 @@ struct emulator::CPU {
         INS_PLA = 0x68,
 
         //PLP
-        INS_PLP = 0x28;
+        INS_PLP = 0x28,
+
+//Logical operations
+
+        //AND
+        INS_AND_IM = 0x29,
+        
+        //OR
+        INS_ORA_IM = 0x12,
+
+        //EOR
+        INS_EOR_IM = 0x52;
+
 
     //sets the right status after load register instr | LDA, LDX, LDY
     void load_register_set_status(byte reg) {
