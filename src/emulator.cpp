@@ -23,7 +23,6 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
     };
 
     const s32 req_cycles = cycles;
-
     while(cycles > 0) {
         byte instruction = fetch_byte(cycles, mem);
 
@@ -303,6 +302,21 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                                    word addr = get_indirect_y_address(cycles, mem);
                                   or_register(addr);
                                } break;
+//BIT
+            case INS_BIT_ZP: {
+                                  word addr = get_zero_page_address(cycles, mem);
+                                  byte value = read_byte(addr, cycles, mem);
+                                  flag.Z = !(A & value);
+                                  flag.N = (value & neg_flag_bit) != 0;
+                                  flag.V = (value & ofl_flag_bit) != 0;
+                              } break;
+            case INS_BIT_ABS: {
+                                  word addr = get_absolute_address(cycles, mem);
+                                  byte value = read_byte(addr, cycles, mem);
+                                  flag.Z = !(A & value);
+                                  flag.N = (value & neg_flag_bit) != 0;
+                                  flag.V = (value & ofl_flag_bit) != 0;
+                              } break;
             default:
                                std::println("Instruction not handled: {}!", instruction);
                                throw -1;

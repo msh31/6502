@@ -155,13 +155,21 @@ struct emulator::CPU {
         INS_EOR_ABSX = 0x5D,
         INS_EOR_ABSY = 0x59,
         INS_EOR_INDX = 0x41,
-        INS_EOR_INDY = 0x51;
+        INS_EOR_INDY = 0x51,
 
+        //BIT
+        INS_BIT_ZP = 0x24,
+        INS_BIT_ABS = 0x2C;
+
+    
+    //helper
+    static constexpr byte neg_flag_bit = 0b10000000,
+                          ofl_flag_bit = 0b01000000;
 
     //sets the right status after load register instr | LDA, LDX, LDY
     void load_register_set_status(byte reg) {
         flag.Z = (reg==0);
-        flag.N = (reg & 0b10000000) > 0;
+        flag.N = (reg & neg_flag_bit) > 0;
     }
 
     void reset(word reset_vector, Memory& mem) {
