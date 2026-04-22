@@ -20,14 +20,14 @@ struct emulator::Memory {
         }
     }
 
-    // read 1 byte 
+// compiler picks between these depending on the usage context, its just smart that way
+    // read 1 byte  | no modify, return copy
     byte operator[](u32 address) const {
         //assert here address is < max_memory
         return data[address];
     }
 
-
-    // write 1 byte 
+    // write 1 byte  | modify, return reference (allows mem[0x0069] = 0xFF for exmple)
     byte& operator[](u32 address) {
         return data[address];
     }
@@ -50,7 +50,7 @@ struct emulator::CPU {
 
     byte A, X, Y;                   //registers
     
-    union { //processor status
+    union { //processor status | allows easy access to the flags, also stores in same mem loc (well thats union does anyway)
         byte ps;
         status_flags flag;
     };
@@ -180,6 +180,7 @@ struct emulator::CPU {
         mem.init();
     }
 
+    //just read, dont advance through the prorgam (see: fetch_byte)
     byte read_byte(word address, s32& cycles, const Memory& mem) {
         byte data = mem[address];
         cycles--;
@@ -192,6 +193,8 @@ struct emulator::CPU {
         // if(addr > 0xFF) cycles--;
     }
 
+    //6502 is little-endian (like all modern cpu's) so a 16-bit addr is stored as 0x00, then 0x80 in mem. 
+    //by bit shifting we reconstruct a 16-bit addr from 2 8-bit bytes
     word read_word(word address, s32& cycles, const Memory& mem) {
         byte low = read_byte(address, cycles, mem);
         byte high = read_byte(address + 1, cycles, mem);
@@ -203,6 +206,7 @@ struct emulator::CPU {
         cycles -= 2;
     }
 
+    //to advance through the program
     byte fetch_byte(s32& cycles, const Memory& mem) {
         byte data = mem[program_counter];
         program_counter++;
@@ -234,7 +238,9 @@ struct emulator::CPU {
         cycles--;
     }
 
-    //push program counter - 1 onto the stack
+    //push program counter - 1 onto the stack | JSR pushes PC to RTS but PC has already advanced past 
+    //those bytes, aka the next instructions, so we need to get it back, which is what RTS does but that also
+    //advances so we do -1 to get to the correct instruction
     void push_program_counter_to_stack(s32& cycles, Memory& mem) {
         write_word(program_counter -1, stack_pointer_to_address() -1, cycles, mem);
         stack_pointer -= 2;
@@ -293,7 +299,7 @@ struct emulator::CPU {
         // A = read_byte(abs_addr_x, cycles, mem);
 
         //crosses page boundary
-        if(abs_addr_x - abs_addr >= 0xff || consume_extra) cycles--;
+        if(abs_addr_x - abs_addr > 0xff || consume_extra) cycles--;
         // load_register_set_status(A);
         return abs_addr_x;
     }
