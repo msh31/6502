@@ -319,6 +319,27 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                                   flag.N = (value & neg_flag_bit) != 0;
                                   flag.V = (value & ofl_flag_bit) != 0;
                               } break;
+//Register Transfers
+            case INS_TAX: {
+                              X = A;
+                              cycles--;
+                              load_register_set_status(X);
+                          } break;
+            case INS_TAY: {
+                              Y = A;
+                              cycles--;
+                              load_register_set_status(Y);
+                          } break;
+            case INS_TXA: {
+                              A = X;
+                              cycles--;
+                              load_register_set_status(A);
+                          } break;
+            case INS_TYA: {
+                              A = Y;
+                              cycles--;
+                              load_register_set_status(A);
+                          } break;
             default:
                                std::println("Instruction not handled: {}!", instruction);
                                throw -1;

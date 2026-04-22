@@ -63,6 +63,7 @@ set(6502_emulator_SOURCES
 	"src/main.cpp"
 	"src/stack_test.cpp"
 	"src/store_tests.cpp"
+	"src/transfer_tests.cpp"
 )
 
 add_executable(6502_emulator)
