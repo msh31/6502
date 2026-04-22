@@ -1,6 +1,8 @@
 #include "emulator.hpp"
 #include <print>
 
+//by val because the cycles are passed down to all helpers which use references
+//its modified internally not by the caller
 u32 emulator::CPU::execute(s32 cycles, Memory& mem) { 
     //load register with value from the a mem address
     auto load_register = [&cycles, &mem, this](word addr, byte& reg) {

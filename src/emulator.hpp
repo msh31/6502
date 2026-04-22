@@ -138,7 +138,7 @@ struct emulator::CPU {
         INS_AND_INDY = 0x31,
         
         //OR
-        INS_ORA_IM = 0x12,
+        INS_ORA_IM = 0x09,
         INS_ORA_ZP = 0x05,
         INS_ORA_ZPX = 0x15,
         INS_ORA_ABS = 0x0D,
@@ -148,7 +148,7 @@ struct emulator::CPU {
         INS_ORA_INDY = 0x11,
 
         //EOR
-        INS_EOR_IM = 0x52,
+        INS_EOR_IM = 0x49,
         INS_EOR_ZP = 0x45,
         INS_EOR_ZPX = 0x55,
         INS_EOR_ABS = 0x4D,
@@ -214,7 +214,8 @@ struct emulator::CPU {
 
         return data;
     }
-    //6502 is little endian
+    //6502 is little endian 
+    //TODO: use read word here to stay consistent
     word fetch_word(s32& cycles, const Memory& mem) {
         word data = mem[program_counter];
         program_counter++;
