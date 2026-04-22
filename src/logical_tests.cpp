@@ -37,10 +37,10 @@ public:
                 return a & b;
                 break;
             case EOR:
-                return a | b;
+                return a ^ b;
                 break;
             case OR:
-                return a ^ b;
+                return a | b;
                 break;
         }
 
@@ -119,7 +119,7 @@ public:
                 break;
         }
         mem[0xFFFD] = 0x42;
-        mem[0x0042] = 0x37;
+        mem[0x0047] = 0x37;
 
         CPU cpu_copy = cpu;
         s32 cycles_used = cpu.execute(4, mem);
@@ -149,7 +149,7 @@ public:
                 break;
         }
         mem[0xFFFD] = 0x80;
-        mem[0x007D] = 0x37;
+        mem[0x007F] = 0x37;
 
         CPU cpu_copy = cpu;
         s32 cycles_used = cpu.execute(4, mem);
@@ -212,7 +212,7 @@ public:
         }
         mem[0xFFFD] = 0x80;
         mem[0xFFFE] = 0x44;
-        mem[0x4480] = 0x37;
+        mem[0x4481] = 0x37;
 
         CPU cpu_copy = cpu;
         s32 cycles_used = cpu.execute(4, mem);
@@ -244,7 +244,7 @@ public:
         }
         mem[0xFFFD] = 0x80;
         mem[0xFFFE] = 0x44;
-        mem[0x4480] = 0x37;
+        mem[0x4481] = 0x37;
 
         CPU cpu_copy = cpu;
         s32 cycles_used = cpu.execute(4, mem);
@@ -370,8 +370,8 @@ public:
                 break;
         }
         mem[0xFFFD] = 0x02;
-        mem[0x0006] = 0x00;
-        mem[0x0007] = 0x80;
+        mem[0x0002] = 0x00;
+        mem[0x0003] = 0x80;
         mem[0x8004] = 0x37;
 
         CPU cpu_copy = cpu;
@@ -389,7 +389,7 @@ public:
     }
     void test_logical_op_indirect_y_cross(e_logical_operation lop) {
         cpu.A = 0xCC;
-        cpu.Y = 0x04;
+        cpu.Y = 0xFF;
         switch( lop ) {
             case AND:
                 mem[0xFFFC] = CPU::INS_AND_INDY;
