@@ -8,6 +8,20 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
         load_register_set_status(reg);
     };
 
+    //AND/EOR/OR the A register with val from the addr
+    auto and_register = [&cycles, &mem, this](word addr) {
+        A &= read_byte(addr, cycles, mem);
+        load_register_set_status(A);
+    };
+    auto eor_register = [&cycles, &mem, this](word addr) {
+        A ^= read_byte(addr, cycles, mem);
+        load_register_set_status(A);
+    };
+    auto or_register = [&cycles, &mem, this](word addr) {
+        A |= read_byte(addr, cycles, mem);
+        load_register_set_status(A);
+    };
+
     const s32 req_cycles = cycles;
 
     while(cycles > 0) {
@@ -33,11 +47,11 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                               } break;
             case INS_LDA_ABSX: {
                                    word addr = get_absolute_x_address(cycles, mem);
-                                  load_register(addr, A);
+                                   load_register(addr, A);
                                } break;
             case INS_LDA_ABSY: {
                                    word addr = get_absolute_y_address(cycles, mem);
-                                  load_register(addr, A);
+                                   load_register(addr, A);
                                } break;
             case INS_LDA_INDX: {
                                    word addr = get_indirect_x_address(cycles, mem);
@@ -66,7 +80,7 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                               } break;
             case INS_LDX_ABSY: {
                                    word addr = get_absolute_y_address(cycles, mem);
-                                  load_register(addr, X);
+                                   load_register(addr, X);
                                } break;
 //LDY
             case INS_LDY_IM: {
@@ -87,7 +101,7 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                               } break;
             case INS_LDY_ABSX: {
                                    word addr = get_absolute_x_address(cycles, mem);
-                                  load_register(addr, Y);
+                                   load_register(addr, Y);
                                } break;
 //STA
             case INS_STA_ZP: {
@@ -95,21 +109,21 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                                  write_byte(A, cycles, addr, mem);
                              } break;
             case INS_STA_ZPX: {
-                                 word addr = get_zero_page_x_address(cycles, mem);
-                                 write_byte(A, cycles, addr, mem);
-                             } break;
+                                  word addr = get_zero_page_x_address(cycles, mem);
+                                  write_byte(A, cycles, addr, mem);
+                              } break;
             case INS_STA_ABS: {
-                                 word addr = get_absolute_address(cycles, mem);
-                                 write_byte(A, cycles, addr, mem);
-                             } break;
+                                  word addr = get_absolute_address(cycles, mem);
+                                  write_byte(A, cycles, addr, mem);
+                              } break;
             case INS_STA_ABSX: {
-                                 word addr = get_absolute_x_address(cycles, mem, true);
-                                 write_byte(A, cycles, addr, mem);
-                             } break;
+                                   word addr = get_absolute_x_address(cycles, mem, true);
+                                   write_byte(A, cycles, addr, mem);
+                               } break;
             case INS_STA_ABSY: {
-                                 word addr = get_absolute_y_address(cycles, mem, true);
-                                 write_byte(A, cycles, addr, mem);
-                             } break;
+                                   word addr = get_absolute_y_address(cycles, mem, true);
+                                   write_byte(A, cycles, addr, mem);
+                               } break;
             case INS_STA_INDX: {
                                    word addr = get_indirect_x_address(cycles, mem);
                                    write_byte(A, cycles, addr, mem);
@@ -155,14 +169,14 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
                           } break;
 //JMP
             case INS_JMP_ABS: {  
-                              word addr = get_absolute_address(cycles, mem);
-                              program_counter = addr;
-                          } break;
+                                  word addr = get_absolute_address(cycles, mem);
+                                  program_counter = addr;
+                              } break;
             case INS_JMP_IND: {  
-                              word addr = get_absolute_address(cycles, mem);
-                              addr = read_word(addr, cycles, mem);
-                              program_counter = addr;
-                          } break;
+                                  word addr = get_absolute_address(cycles, mem);
+                                  addr = read_word(addr, cycles, mem);
+                                  program_counter = addr;
+                              } break;
 //TSX
             case INS_TSX: {  
                               X = stack_pointer;
@@ -190,10 +204,109 @@ u32 emulator::CPU::execute(s32 cycles, Memory& mem) {
             case INS_PLP: { 
                               ps = pop_byte_from_stack(cycles, mem);
                           } break;
+//AND
+            case INS_AND_IM: {
+                                 A &= fetch_byte(cycles, mem);
+                                 load_register_set_status(A);
+                             } break;
+            case INS_AND_ZP: {
+                                 word addr = get_zero_page_address(cycles, mem);
+                                 and_register(addr);
+                             } break;
+            case INS_AND_ZPX: {
+                                  word addr = get_zero_page_x_address(cycles, mem);
+                                  and_register(addr);
+                              } break;
+            case INS_AND_ABS: {
+                                  word addr = get_absolute_address(cycles, mem);
+                                  and_register(addr);
+                              } break;
+            case INS_AND_ABSX: {
+                                   word addr = get_absolute_x_address(cycles, mem);
+                                   and_register(addr);
+                               } break;
+            case INS_AND_ABSY: {
+                                   word addr = get_absolute_y_address(cycles, mem);
+                                   and_register(addr);
+                               } break;
+            case INS_AND_INDX: {
+                                   word addr = get_indirect_x_address(cycles, mem);
+                                   and_register(addr);
+                               } break;
+            case INS_AND_INDY: {
+                                   word addr = get_indirect_y_address(cycles, mem);
+                                   and_register(addr);
+                               } break;
+//EOR
+            case INS_EOR_IM: {
+                                 A ^= fetch_byte(cycles, mem);
+                                 load_register_set_status(A);
+                             } break;
+            case INS_EOR_ZP: {
+                                 word addr = get_zero_page_address(cycles, mem);
+                                 eor_register(addr);
+                             } break;
+            case INS_EOR_ZPX: {
+                                  word addr = get_zero_page_x_address(cycles, mem);
+                                  eor_register(addr);
+                              } break;
+            case INS_EOR_ABS: {
+                                  word addr = get_absolute_address(cycles, mem);
+                                  eor_register(addr);
+                              } break;
+            case INS_EOR_ABSX: {
+                                   word addr = get_absolute_x_address(cycles, mem);
+                                  eor_register(addr);
+                               } break;
+            case INS_EOR_ABSY: {
+                                   word addr = get_absolute_y_address(cycles, mem);
+                                  eor_register(addr);
+                               } break;
+            case INS_EOR_INDX: {
+                                   word addr = get_indirect_x_address(cycles, mem);
+                                  eor_register(addr);
+                               } break;
+            case INS_EOR_INDY: {
+                                   word addr = get_indirect_y_address(cycles, mem);
+                                  eor_register(addr);
+                               } break;
+//OR
+            case INS_ORA_IM: {
+                                 A |= fetch_byte(cycles, mem);
+                                 load_register_set_status(A);
+                             } break;
+            case INS_ORA_ZP: {
+                                 word addr = get_zero_page_address(cycles, mem);
+                                 or_register(addr);
+                             } break;
+            case INS_ORA_ZPX: {
+                                  word addr = get_zero_page_x_address(cycles, mem);
+                                  or_register(addr);
+                              } break;
+            case INS_ORA_ABS: {
+                                  word addr = get_absolute_address(cycles, mem);
+                                  or_register(addr);
+                              } break;
+            case INS_ORA_ABSX: {
+                                   word addr = get_absolute_x_address(cycles, mem);
+                                  or_register(addr);
+                               } break;
+            case INS_ORA_ABSY: {
+                                   word addr = get_absolute_y_address(cycles, mem);
+                                  or_register(addr);
+                               } break;
+            case INS_ORA_INDX: {
+                                   word addr = get_indirect_x_address(cycles, mem);
+                                  or_register(addr);
+                               } break;
+            case INS_ORA_INDY: {
+                                   word addr = get_indirect_y_address(cycles, mem);
+                                  or_register(addr);
+                               } break;
             default:
-                          std::println("Instruction not handled: {}!", instruction);
-                          throw -1;
-                          break;
+                               std::println("Instruction not handled: {}!", instruction);
+                               throw -1;
+                               break;
         }
     }
     return req_cycles - cycles;
