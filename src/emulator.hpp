@@ -306,7 +306,8 @@ struct emulator::CPU {
         // A = read_byte(abs_addr_x, cycles, mem);
 
         //crosses page boundary
-        if(abs_addr_x - abs_addr > 0xff || consume_extra) cycles--;
+        if((abs_addr & 0xFF00) != (abs_addr_x & 0xFF00)) cycles--;
+        // if(abs_addr_x - abs_addr >= 0xff || consume_extra) cycles--;
         // load_register_set_status(A);
         return abs_addr_x;
     }
